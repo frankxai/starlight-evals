@@ -61,6 +61,8 @@ rounds/         — model-lane arena round receipts
 
 The Proving Ground is a usage pattern plus a scorecard contract, not a black box. Read `SPEC.md`, point the lanes at your own infra, and run the evaluator with the kernel mindset. The harness is [Claude Code](https://claude.com/claude-code) Agent-tool model overrides — zero extra infrastructure.
 
+**→ New here? [`CONTRIBUTING.md`](./CONTRIBUTING.md) has a "fork & run in ~10 minutes" path** and an open invitation: run the discipline on *your* stack, then open a [scorecard submission](./.github/ISSUE_TEMPLATE/scorecard-submission.md). The goal is a registry of community scorecards — people measuring their own systems honestly, not consuming ours.
+
 ---
 
 Built on SIP — Starlight Intelligence Protocol. Code: MIT. Methodology: open.
