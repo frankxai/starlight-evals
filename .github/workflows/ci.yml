@@ -1,0 +1,33 @@
+# Built on SIP — Starlight Evals CI.
+# (a) Validate lanes.json + every scorecards/*.json parses.
+# (b) Run the income/payments red-blue harness. Cross-repo probes (R4/R5/R6
+#     against the payments MCP, R3 against the income site) degrade to PENDING
+#     in CI because those repos are not checked out here — that is expected and
+#     the harness exits 0. CI fails only on a real defense regression (a probe
+#     the harness actually ran returning FAIL).
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-and-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Validate lanes.json + scorecards JSON parse
+        run: node scripts/validate-json.mjs
+
+      - name: Run income/payments red-blue harness (MCP-graceful → PENDING in CI)
+        run: node harness/income-payments-safety.mjs
+
+      - name: Validate emitted scorecard parses
+        run: node -e "JSON.parse(require('node:fs').readFileSync('scorecards/income-payments-safety-v0.2.json','utf8')); console.log('emitted scorecard parses OK')"

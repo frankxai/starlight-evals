@@ -1,0 +1,7 @@
+# Node
+node_modules/
+
+# Payments MCP runtime artifacts — the imported payments MCP persists its
+# append-only audit log + spend ledger to .payments-data/ relative to cwd.
+# These are run-local receipts, never committed to the evals mirror.
+.payments-data/

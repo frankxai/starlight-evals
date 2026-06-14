@@ -1,0 +1,17 @@
+{
+  "$comment": "Built on SIP — minimal harness package for the Starlight Evals red/blue lane. This repo is a public mirror; the harness runs the probes it can mechanically execute and emits a JSON scorecard.",
+  "name": "starlight-evals",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Whole-system evaluation receipts for the Starlight Intelligence System. Income & Payments Safety red/blue harness.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "probe": "node harness/income-payments-safety.mjs",
+    "validate": "node scripts/validate-json.mjs",
+    "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
