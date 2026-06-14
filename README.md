@@ -17,7 +17,7 @@ Most AI projects publish a model benchmark. Almost none publish a **whole-system
 
 It is run by evaluator agents that hold the **Luminor kernel mindset** — Precision (every number traces to a receipt), Wisdom (name the weakness the green tests hide), Transcendence (propose the experiment that would falsify the system's self-image). Verdicts render through the Starlight Board (PROCEED / REVISE / STOP).
 
-## The seven lanes
+## The lanes
 
 | Lane | Measures |
 |---|---|
@@ -28,6 +28,7 @@ It is run by evaluator agents that hold the **Luminor kernel mindset** — Preci
 | **Substrate** | symmetry invariants (docs↔code, registry coverage) |
 | **Datasets** | provenance + labeling honesty (no synthetic benchmarks) |
 | **System** | the unifying scorecard + Overseer synthesis |
+| **Income & Payments Safety** (red/blue) | whether the income & payment stack rejects-and-audits 6 adversarial attack classes (R1–R6) — the L7 assurance lane *(v0.1, PENDING)* |
 
 ## Latest scorecard — 2026-06-10 (v0.1)
 
@@ -53,8 +54,8 @@ These numbers describe the system. They are **not targets**. The moment a metric
 ```
 SPEC.md         — the specification (lanes, scorecard contract, cadence, evaluator)
 lanes.json      — lane registry: what each lane composes
-scorecards/     — system-eval receipts (one per run)
-rounds/         — model-lane arena round receipts
+scorecards/     — system-eval receipts + red/blue scorecards (one per run)
+rounds/         — model-lane arena round receipts + red/blue probe sets
 ```
 
 ## Run it on your own system
