@@ -1,3 +1,17 @@
+<!-- GITHUB_VISUALS_START -->
+<p align="center">
+  <img src="assets/github/header.svg" alt="Starlight Evals - Whole-system evals and income/payments red-blue lane" width="100%">
+</p>
+
+<details open>
+<summary><strong>How this repo works</strong></summary>
+<p align="center">
+  <img src="assets/github/how-it-works.svg" alt="Starlight Evals operating map" width="100%">
+</p>
+</details>
+
+<!-- GITHUB_VISUALS_END -->
+
 # Starlight Evals
 
 > Whole-system evaluation for the [Starlight Intelligence System](https://github.com/frankxai/Starlight-Intelligence-System) — models, memory, retrieval, harness, substrate, and datasets — with receipts, named weaknesses, and a cadence. Built on SIP.
