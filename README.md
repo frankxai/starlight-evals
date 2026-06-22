@@ -1,12 +1,19 @@
 <!-- GITHUB_VISUALS_START -->
 <p align="center">
-  <img src="assets/github/header.svg" alt="Starlight Evals - Whole-system evals and income/payments red-blue lane" width="100%">
+  <img src="assets/github/header.svg" alt="Starlight Evals - Whole-system evals and income/payments red-blue lane." width="100%">
 </p>
 
 <details open>
 <summary><strong>How this repo works</strong></summary>
 <p align="center">
   <img src="assets/github/how-it-works.svg" alt="Starlight Evals operating map" width="100%">
+</p>
+</details>
+
+<details>
+<summary><strong>Build, deploy, verify path</strong></summary>
+<p align="center">
+  <img src="assets/github/build-deploy-verify.svg" alt="Starlight Evals build deploy verify path" width="100%">
 </p>
 </details>
 
