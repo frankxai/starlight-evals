@@ -23,8 +23,41 @@
 
 > Whole-system evaluation for the [Starlight Intelligence System](https://github.com/frankxai/Starlight-Intelligence-System) — models, memory, retrieval, harness, substrate, and datasets — with receipts, named weaknesses, and a cadence. Built on SIP.
 
+[![CI](https://github.com/frankxai/starlight-evals/actions/workflows/ci.yml/badge.svg)](https://github.com/frankxai/starlight-evals/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2563eb)](LICENSE)
+[![Built on SIP](https://img.shields.io/badge/built%20on-SIP-7c3aed)](https://github.com/frankxai/Starlight-Intelligence-System)
+[![Mirror](https://img.shields.io/badge/source-public%20mirror-0f766e)](#this-repo-is-a-mirror-not-the-origin)
+[![Contributions](https://img.shields.io/badge/contributions-scorecards%20welcome-f59e0b)](CONTRIBUTING.md)
+
 **Last run: 2026-06-10 · Next run due: 2026-07-10 · Status: 🟢 current**
 *(If the next-run date is in the past, this surface is STALE and the numbers below are no longer trustworthy. Staleness is shown, never hidden.)*
+
+---
+
+## 90-second start
+
+Use this repo when you want to inspect the published Starlight scorecards, fork the eval discipline for your own system, or run the mechanical red/blue lane locally.
+
+```bash
+git clone https://github.com/frankxai/starlight-evals.git
+cd starlight-evals
+npm run validate
+# Optional: runs any cross-repo probes it can find and exits nonzero on a real defense failure.
+npm run probe
+```
+
+Start with:
+
+| I want to... | Start with |
+|---|---|
+| Understand the scoring contract | [`SPEC.md`](SPEC.md) |
+| Inspect the latest system result | [`scorecards/2026-06-10-system-eval-v0.1.json`](scorecards/2026-06-10-system-eval-v0.1.json) |
+| Trace which lanes compose the score | [`lanes.json`](lanes.json) |
+| Validate published JSON receipts | `npm run validate` |
+| Run the current adversarial probe | `npm run probe` |
+| Publish my own scorecard | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
+
+Requirements: Node.js 22+ for the local harness scripts. No database, server, or private Starlight infrastructure is required for receipt validation. The adversarial probe degrades absent cross-repo dependencies to `PENDING`; if it finds a real checked defense failure, `STOP` and a nonzero exit are expected.
 
 ---
 
