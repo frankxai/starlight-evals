@@ -51,7 +51,7 @@ System verdict: **PROCEED-WITH-REVISE**
 | Substrate | PROCEED | green after catching a real orphan | symmetry suite is load-bearing |
 | Datasets | PROCEED | 0 synthetic benchmarks | token-overlap ground truth is soft |
 
-On its first run, the substrate lane caught the release's own new agent (`starlight-evaluator.md`) sitting unregistered and flagged it — the symmetry test failed 14/15 until the registry entry was added. A Proving Ground that can't catch its own builder is theater.
+On its first run, the substrate lane caught the release's own new agent (`agents/starlight-evaluator.md`) sitting unregistered and flagged it — the symmetry test failed 14/15 until the registry entry was added. A Proving Ground that can't catch its own builder is theater.
 
 Full receipts: [`scorecards/`](./scorecards) (system + memory-lane runs) and [`rounds/`](./rounds) (model-arena rounds).
 
