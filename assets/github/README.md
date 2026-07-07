@@ -7,3 +7,5 @@ Generated 2026-06-22 from the Agentic Income GitHub Visual System.
 - `provenance.json` records sources and imagegen usage.
 
 The assets are deterministic SVG so labels stay crisp in GitHub READMEs. Raster image generation is reserved for text-free style frames and backgrounds.
+
+Built on SIP

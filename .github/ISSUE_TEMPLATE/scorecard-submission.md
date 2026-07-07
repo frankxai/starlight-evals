@@ -21,3 +21,5 @@ What do the green numbers NOT cover? (A scorecard without this is incomplete.)
 - [ ] If judged: blind, non-contestant, bias noted
 - [ ] Anti-Goodhart: these numbers describe the system, not a target
 - [ ] `ranAt` / `nextRunDue` stamped
+
+Built on SIP
