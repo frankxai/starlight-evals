@@ -1,0 +1,23 @@
+# Starlight Evals — promptfoo harness (Wave 0 stub; cases wired in Wave 1)
+#
+# Wave 1 wires the 8 markdown evals from starlight-agent-config/evals/ as
+# llm-rubric cases, with providers routed through LiteLLM per-brand virtual
+# keys (fallback: direct provider keys via env).
+#
+# Run (no install needed): npx -y promptfoo@latest eval -c promptfooconfig.yaml
+
+description: "Starlight agent-constitution evals — behavioral rubric harness"
+
+# providers: wired in Wave 1 (LiteLLM gateway or direct anthropic:claude-sonnet-5)
+providers: []
+
+prompts: []
+
+tests: []
+# Example shape (Wave 1):
+#   - description: follows-user-intent
+#     vars:
+#       task: "..."
+#     assert:
+#       - type: llm-rubric
+#         value: file://../starlight-agent-config/evals/follows-user-intent.md

@@ -9,7 +9,9 @@
   "scripts": {
     "probe": "node harness/income-payments-safety.mjs",
     "validate": "node scripts/validate-json.mjs",
-    "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs"
+    "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs",
+    "lint:skills": "node scripts/lint-skills.mjs",
+    "eval:pf": "npx -y promptfoo@latest eval -c promptfooconfig.yaml"
   },
   "engines": {
     "node": ">=22"
