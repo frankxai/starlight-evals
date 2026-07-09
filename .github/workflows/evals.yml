@@ -14,6 +14,22 @@
 #   runs the live promptfoo eval against the 7 wired agent-constitution
 #   rubrics and uploads the JSON scorecard as a build artifact. Skips
 #   cleanly (no failure) when the secret is absent, e.g. on forks.
+#
+# NOTE on providers (Wave 2, 2026-07-09): promptfooconfig.yaml's default
+# providers now point at providers/claude-cli.mjs, a custom provider that
+# shells out to the local `claude` CLI (Frank's subscription OAuth session,
+# no API key). That is the intended path for LOCAL runs on a machine where
+# `claude` is already logged in — see scorecards/2026-07-09-cli-bootstrap.md
+# for the harness verification and its current auth blocker.
+#
+# CI runners have no `claude` binary and no interactive login, so job 2
+# below overrides the provider at the CLI (`--providers` / `--grader`,
+# promptfoo's own override flags) back to the key-gated
+# `anthropic:messages:*` path instead of running promptfooconfig.yaml's
+# CLI-provider default unmodified. This keeps one config file for both paths
+# (no duplicated test list) and keeps the cloud run optional: it continues
+# to skip cleanly (no failure) when ANTHROPIC_API_KEY is absent, e.g. on
+# forks, and only spends CI minutes when the secret is actually configured.
 name: evals
 
 on:
@@ -82,6 +98,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           npx -y promptfoo@latest eval -c promptfooconfig.yaml --no-cache -j 2 \
+            --providers anthropic:messages:claude-sonnet-5 \
+            --grader anthropic:messages:claude-opus-4-8 \
             --output promptfoo-scorecard.json
 
       - name: Upload scorecard artifact

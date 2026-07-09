@@ -1,4 +1,4 @@
-# Starlight Evals — promptfoo harness (Wave 1: wired)
+# Starlight Evals — promptfoo harness (Wave 2: local claude-CLI provider)
 #
 # Wires the 7 markdown evals that currently exist in
 # starlight-agent-config/evals/ (its README.md lists 7; no 8th file was
@@ -11,25 +11,42 @@
 # copied verbatim — nothing invented. The rubric assertion loads the whole
 # eval file (Objective + Pass Criteria + Fail Patterns + Score) via file://.
 #
-# Model under test: anthropic:messages:claude-sonnet-5
-# Grading model:    anthropic:messages:claude-opus-4-8, via
-#                   defaultTest.options.provider — confirmed supported by
-#                   inspecting promptfoo's evaluator source directly
-#                   (`defaultTest.options.provider` is read as the default
-#                   grading provider for model-graded asserts like llm-rubric).
+# Model under test AND grader both run through providers/claude-cli.mjs, a
+# custom promptfoo provider that shells out to the local `claude` CLI in
+# `-p` (print) mode — no ANTHROPIC_API_KEY needed, it rides Frank's existing
+# Claude subscription OAuth session (`claude auth status`). See that file's
+# header comment for how the custom-provider contract was verified against
+# promptfoo's own loader source.
+#
+#   - model-under-test config.model: sonnet
+#   - grader (defaultTest.options.provider) config.model: opus
+#
+# `defaultTest.options.provider` accepting a `{ id: file://..., config }`
+# object (not just a bare string) was confirmed the same way: promptfoo's
+# provider-ref resolution (`resolveProvider` / `normalizeProviderRef` in
+# providers-DehrvR_t.js) treats any object with an `id` field as a
+# ProviderOptions descriptor and round-trips it through the same
+# `loadApiProvider` used for the top-level `providers:` list.
 #
 # Run: npx -y promptfoo@latest eval -c promptfooconfig.yaml --no-cache
-# Requires ANTHROPIC_API_KEY in env for both the model-under-test and grader.
+# Local run requires only the `claude` CLI on PATH, logged in
+# (`claude auth status`). CI's key-gated job (.github/workflows/evals.yml)
+# remains available as an optional cloud fallback using ANTHROPIC_API_KEY.
 
 description: "Starlight agent-constitution evals — behavioral rubric harness"
 
 providers:
-  - id: anthropic:messages:claude-sonnet-5
+  - id: file://providers/claude-cli.mjs
     label: model-under-test
+    config:
+      model: sonnet
 
 defaultTest:
   options:
-    provider: anthropic:messages:claude-opus-4-8
+    provider:
+      id: file://providers/claude-cli.mjs
+      config:
+        model: opus
 
 prompts:
   - "{{task}}"
