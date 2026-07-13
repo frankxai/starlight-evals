@@ -540,7 +540,7 @@ async function main() {
   // run on a machine without sibling-repo deps degrades to PENDING and would
   // silently destroy the published 4-PASS evidence. Promote out/ → scorecards/
   // only as a deliberate, reviewed commit.
-  const ranAtSlug = scorecard.ranAt ? String(scorecard.ranAt).replace(/[:]/g, "-") : RUN_ID;
+  const ranAtSlug = scorecard.ranAt ? String(scorecard.ranAt).replace(/[:]/g, "-") : RAN_AT;
   const outPath = join(REPO_ROOT, "out", `income-payments-safety-${ranAtSlug}.json`);
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, JSON.stringify(scorecard, null, 2) + "\n", "utf8");
