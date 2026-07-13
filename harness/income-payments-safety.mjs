@@ -536,7 +536,12 @@ async function main() {
     attestation: "Built on SIP — Starlight Intelligence Protocol",
   };
 
-  const outPath = join(REPO_ROOT, "scorecards", "income-payments-safety-v0.2.json");
+  // Write to out/, never over the committed receipt in scorecards/ — a probe
+  // run on a machine without sibling-repo deps degrades to PENDING and would
+  // silently destroy the published 4-PASS evidence. Promote out/ → scorecards/
+  // only as a deliberate, reviewed commit.
+  const ranAtSlug = scorecard.ranAt ? String(scorecard.ranAt).replace(/[:]/g, "-") : RUN_ID;
+  const outPath = join(REPO_ROOT, "out", `income-payments-safety-${ranAtSlug}.json`);
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, JSON.stringify(scorecard, null, 2) + "\n", "utf8");
 

@@ -26,8 +26,14 @@ jobs:
       - name: Validate lanes.json + scorecards JSON parse
         run: node scripts/validate-json.mjs
 
-      - name: Run income/payments red-blue harness (MCP-graceful → PENDING in CI)
+      - name: Validate COMMITTED scorecard parses (before harness writes anything)
+        run: node -e "JSON.parse(require('node:fs').readFileSync('scorecards/income-payments-safety-v0.2.json','utf8')); console.log('committed scorecard parses OK')"
+
+      - name: Run income/payments red-blue harness (MCP-graceful → PENDING in CI; writes to out/, never scorecards/)
         run: node harness/income-payments-safety.mjs
 
       - name: Validate emitted scorecard parses
-        run: node -e "JSON.parse(require('node:fs').readFileSync('scorecards/income-payments-safety-v0.2.json','utf8')); console.log('emitted scorecard parses OK')"
+        run: node -e "const fs=require('node:fs');const f=fs.readdirSync('out').find(n=>n.startsWith('income-payments-safety-'));JSON.parse(fs.readFileSync('out/'+f,'utf8'));console.log('emitted scorecard '+f+' parses OK')"
+
+      - name: Committed receipt untouched by harness run
+        run: git diff --exit-code scorecards/

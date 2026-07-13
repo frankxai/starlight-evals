@@ -29,7 +29,7 @@
 [![Mirror](https://img.shields.io/badge/source-public%20mirror-0f766e)](#this-repo-is-a-mirror-not-the-origin)
 [![Contributions](https://img.shields.io/badge/contributions-scorecards%20welcome-f59e0b)](CONTRIBUTING.md)
 
-**Last run: 2026-06-10 · Next run due: 2026-07-10 · Status: 🟢 current**
+**Last run: 2026-06-10 · Next run due: 2026-07-10 · Status: 🔴 STALE (overdue — re-run `/starlight-eval` before trusting the numbers below)**
 *(If the next-run date is in the past, this surface is STALE and the numbers below are no longer trustworthy. Staleness is shown, never hidden.)*
 
 ---

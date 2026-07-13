@@ -5,3 +5,7 @@ node_modules/
 # append-only audit log + spend ledger to .payments-data/ relative to cwd.
 # These are run-local receipts, never committed to the evals mirror.
 .payments-data/
+
+# Harness output — probe runs write here (out/), never over the committed
+# receipts in scorecards/. Promote deliberately via a reviewed commit.
+out/
