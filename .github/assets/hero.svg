@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300">
+<defs>
+  <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="#0d1117"/>
+    <stop offset="100%" stop-color="#0a0a0b"/>
+  </radialGradient>
+  <linearGradient id="eg" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#10b981"/>
+    <stop offset="100%" stop-color="#f59e0b"/>
+  </linearGradient>
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+    <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+<rect width="1200" height="300" fill="url(#bg)"/>
+
+<!-- Dashboard frame -->
+<rect x="80" y="50" width="1040" height="175" rx="6" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+<!-- Bar labels (left) -->
+<text x="100" y="83" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10">Model     </text>
+<text x="100" y="108" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10">Memory    </text>
+<text x="100" y="133" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10">Retrieval </text>
+<text x="100" y="158" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10">Harness   </text>
+<text x="100" y="183" fill="#94a3b8" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10">Substrate </text>
+
+<!-- Bar backgrounds -->
+<rect x="200" y="70" width="780" height="16" rx="3" fill="#1e293b"/>
+<rect x="200" y="95" width="780" height="16" rx="3" fill="#1e293b"/>
+<rect x="200" y="120" width="780" height="16" rx="3" fill="#1e293b"/>
+<rect x="200" y="145" width="780" height="16" rx="3" fill="#1e293b"/>
+<rect x="200" y="170" width="780" height="16" rx="3" fill="#1e293b"/>
+
+<!-- Animated bars filling from left -->
+<!-- Row 1: Model — PROCEED (88%) -->
+<rect x="200" y="70" width="0" height="16" rx="3" fill="#10b981">
+  <animate attributeName="width" values="0;686" dur="1.6s" begin="0.1s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+</rect>
+<!-- Row 2: Memory — REVISE (42%) -->
+<rect x="200" y="95" width="0" height="16" rx="3" fill="#f59e0b">
+  <animate attributeName="width" values="0;328" dur="1.4s" begin="0.3s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+</rect>
+<!-- Row 3: Retrieval — PROCEED (95%) -->
+<rect x="200" y="120" width="0" height="16" rx="3" fill="#10b981">
+  <animate attributeName="width" values="0;741" dur="1.7s" begin="0.5s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+</rect>
+<!-- Row 4: Harness — PROCEED (92%) — amber accent for top -->
+<rect x="200" y="145" width="0" height="16" rx="3" fill="#f59e0b">
+  <animate attributeName="width" values="0;718" dur="1.5s" begin="0.7s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+</rect>
+<!-- Row 5: Substrate — PROCEED (90%) -->
+<rect x="200" y="170" width="0" height="16" rx="3" fill="#10b981">
+  <animate attributeName="width" values="0;702" dur="1.6s" begin="0.9s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+</rect>
+
+<!-- Score labels (right) -->
+<text x="995" y="83" fill="#10b981" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10" opacity="0">88%  PROCEED
+  <animate attributeName="opacity" values="0;1" dur="0.3s" begin="1.7s" fill="freeze"/>
+</text>
+<text x="995" y="108" fill="#f59e0b" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10" opacity="0">42%  REVISE
+  <animate attributeName="opacity" values="0;1" dur="0.3s" begin="1.7s" fill="freeze"/>
+</text>
+<text x="995" y="133" fill="#10b981" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10" opacity="0">95%  PROCEED
+  <animate attributeName="opacity" values="0;1" dur="0.3s" begin="1.7s" fill="freeze"/>
+</text>
+<text x="995" y="158" fill="#f59e0b" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10" opacity="0">92%  PROCEED
+  <animate attributeName="opacity" values="0;1" dur="0.3s" begin="1.7s" fill="freeze"/>
+</text>
+<text x="995" y="183" fill="#10b981" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10" opacity="0">90%  PROCEED
+  <animate attributeName="opacity" values="0;1" dur="0.3s" begin="1.7s" fill="freeze"/>
+</text>
+
+<!-- Title and tagline -->
+<text x="600" y="252" fill="url(#eg)" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="28" font-weight="700" text-anchor="middle" letter-spacing="4" filter="url(#glow)">STARLIGHT EVALS</text>
+<text x="600" y="272" fill="#64748b" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="11" text-anchor="middle" letter-spacing="1">Model evaluation · Agent quality benchmarking · Performance validation</text>
+
+<!-- Built on SIP footer -->
+<text x="24" y="292" fill="#f59e0b" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="11" opacity="0.8">Built on SIP</text>
+<text x="1176" y="292" fill="#334155" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="10" text-anchor="end" opacity="0.6">v0.1</text>
+</svg>
