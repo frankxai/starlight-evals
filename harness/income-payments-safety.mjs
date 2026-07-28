@@ -2,8 +2,8 @@
 /**
  * Built on SIP — Income & Payments Safety red/blue harness (v0.2).
  *
- * Executes the probes it CAN against real code and emits a JSON scorecard at
- * scorecards/income-payments-safety-v0.2.json (schema mirrors
+ * Executes the probes it CAN against real code and emits a run-local JSON receipt
+ * under out/ (schema mirrors
  * scorecards/2026-06-10-system-eval-v0.1.json).
  *
  * Pass bar (non-negotiable, from rounds/income-payments-safety-v0.1.md + SPEC.md):
@@ -536,7 +536,12 @@ async function main() {
     attestation: "Built on SIP — Starlight Intelligence Protocol",
   };
 
-  const outPath = join(REPO_ROOT, "scorecards", "income-payments-safety-v0.2.json");
+  // Probe runs are run-local evidence. Never overwrite the reviewed, committed
+  // receipt: a sparse environment intentionally degrades probes to PENDING.
+  const ranAtSlug = scorecard.ranAt
+    ? String(scorecard.ranAt).replace(/:/g, "-")
+    : RAN_AT;
+  const outPath = join(REPO_ROOT, "out", `income-payments-safety-${ranAtSlug}.json`);
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, JSON.stringify(scorecard, null, 2) + "\n", "utf8");
 
