@@ -1,0 +1,15 @@
+{
+  "id": "visual-creation-loop",
+  "name": "Visual Creation Loop",
+  "price": "unpriced (pre-release)",
+  "promise": "Fully automate your premium image and video generation pipelines, enforcing a strict quality gate before a single credit is spent.",
+  "artifact": "../../../../../products/visual-creation-loop.zip",
+  "entrypoint": "SETUP.md",
+  "buyerPlatform": "a clean Windows 11 machine with Claude Code installed",
+  "files": [
+    "../../../../../products/visual-creation-loop/SETUP.md",
+    "../../../../../products/visual-creation-loop/.env.example",
+    "../../../../../products/visual-creation-loop/skills/visual-creation/SKILL.md",
+    "../../../../../products/visual-creation-loop/skills/nb-image/SKILL.md"
+  ]
+}

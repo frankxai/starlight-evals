@@ -8,6 +8,7 @@
   "type": "module",
   "scripts": {
     "probe": "node harness/income-payments-safety.mjs",
+    "g2": "node harness/g2-buyer-sim/run.mjs",
     "validate": "node scripts/validate-json.mjs",
     "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs",
     "lint:skills": "node scripts/lint-skills.mjs",
