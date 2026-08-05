@@ -1,0 +1,115 @@
+# Built on SIP — Starlight Evals: promptfoo rubric harness + linters.
+#
+# Separate from ci.yml (which owns the income/payments red-blue probe and
+# JSON-receipt validation). This workflow owns the Wave 1 promptfoo rubric
+# harness and the lightweight static checks around it.
+#
+# Job 1 (always) — zero external cost, no API keys required:
+#   node --check on every script, `npm run validate`, and the skill linter
+#   against fixtures/lint/ (a small known-good fixture kept in this repo;
+#   real skill repos run lint-skills.mjs against their own full tree in
+#   their own CI — see fixtures/lint/README.md).
+#
+# Job 2 (only when secrets.ANTHROPIC_API_KEY is configured on this repo) —
+#   runs the live promptfoo eval against the 7 wired agent-constitution
+#   rubrics and uploads the JSON scorecard as a build artifact. Skips
+#   cleanly (no failure) when the secret is absent, e.g. on forks.
+#
+# NOTE on providers (Wave 2, 2026-07-09): promptfooconfig.yaml's default
+# providers now point at providers/claude-cli.mjs, a custom provider that
+# shells out to the local `claude` CLI (Frank's subscription OAuth session,
+# no API key). That is the intended path for LOCAL runs on a machine where
+# `claude` is already logged in — see scorecards/2026-07-09-cli-bootstrap.md
+# for the harness verification and its current auth blocker.
+#
+# CI runners have no `claude` binary and no interactive login, so job 2
+# below overrides the provider at the CLI (`--providers` / `--grader`,
+# promptfoo's own override flags) back to the key-gated
+# `anthropic:messages:*` path instead of running promptfooconfig.yaml's
+# CLI-provider default unmodified. This keeps one config file for both paths
+# (no duplicated test list) and keeps the cloud run optional: it continues
+# to skip cleanly (no failure) when ANTHROPIC_API_KEY is absent, e.g. on
+# forks, and only spends CI minutes when the secret is actually configured.
+name: evals
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "promptfooconfig.yaml"
+      - "evals-sources/**"
+      - "fixtures/lint/**"
+      - "scripts/**"
+      - ".github/workflows/evals.yml"
+
+concurrency:
+  group: evals-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: node --check every script
+        run: |
+          set -e
+          for f in scripts/*.mjs harness/*.mjs; do
+            echo "checking $f"
+            node --check "$f"
+          done
+
+      - name: npm run validate (lanes.json + routing-table.json + scorecards + promptfooconfig.yaml existence)
+        run: npm run validate
+
+      - name: lint:skills against fixtures/lint/ (repo-local smoke test)
+        run: npm run lint:skills -- --strict fixtures/lint
+
+  promptfoo-eval:
+    needs: static-checks
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.pull_request.draft == false) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Check ANTHROPIC_API_KEY is configured
+        id: has_key
+        run: |
+          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run promptfoo eval (model-under-test + rubric grader)
+        if: steps.has_key.outputs.present == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          npx -y promptfoo@latest eval -c promptfooconfig.yaml --no-cache -j 2 \
+            --providers anthropic:messages:claude-sonnet-5 \
+            --grader anthropic:messages:claude-opus-4-8 \
+            --output promptfoo-scorecard.json
+
+      - name: Upload scorecard artifact
+        if: steps.has_key.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptfoo-scorecard
+          path: promptfoo-scorecard.json
+          retention-days: 30
+
+      - name: Skipped — no ANTHROPIC_API_KEY configured
+        if: steps.has_key.outputs.present == 'false'
+        run: echo "ANTHROPIC_API_KEY secret not set on this repo — skipping live promptfoo run. Static checks in the other job already passed."
