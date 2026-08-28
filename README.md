@@ -83,6 +83,7 @@ It is run by evaluator agents that hold the **Luminor kernel mindset** — Preci
 | **Datasets** | provenance + labeling honesty (no synthetic benchmarks) |
 | **System** | the unifying scorecard + Overseer synthesis |
 | **Income & Payments Safety** (red/blue) | whether the income & payment stack rejects-and-audits 6 adversarial attack classes (R1–R6) — the L7 assurance lane *(v0.1, PENDING)* |
+| **Deep Reasoning** (R4) | whether the expensive model tiers buy fewer wrong answers than the cheap tiers where one wrong intermediate step propagates, cost-adjusted *(v0.1, ran 2026-08-28 — VOID-EQUIVALENT: the card saturated and separated nothing)* |
 
 ## Latest scorecard — 2026-06-10 (v0.1)
 

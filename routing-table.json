@@ -45,9 +45,10 @@
       "confidence": "low",
       "autoApply": false,
       "stakes": "medium",
-      "evidence": "Doctrine, NOT yet measured — no arena card has a deep-reasoning lane where Opus ceiling would show. R4 must build it before this hardens.",
+      "evidence": "STILL NOT MEASURED — but now for a known reason rather than an absent one. R4 was built and RAN on 2026-08-28 (design: rounds/R4-DESIGN.md; tasks: fixtures/deep-reasoning/; runner: harness/deep-reasoning.mjs, npm run eval:r4; receipt: rounds/2026-08-28-r4-deep-reasoning.json) and came back VOID-EQUIVALENT: the card saturated. All four tiers passed all six tasks in run 1; in run 2 the only two non-PASS cells were a transport error and a missing answer line, neither a wrong answer. 46 of 46 answered cells were correct across both runs and no pre-registered attractor was taken by any tier. The card therefore never located an Opus or Fable ceiling, so route=opus remains a doctrine heuristic, exactly as before R4.",
       "rounds": 0,
-      "note": "autoApply=false until R4 confirms. Until then this is a heuristic, not a finding."
+      "design": "rounds/R4-DESIGN.md — pre-registered hypothesis, per-tier predictions, void rule, and the falsification criteria that decide in advance what would move this route to fable, to sonnet/haiku, or keep it on opus.",
+      "note": "autoApply=false. rounds stays 0: a void-equivalent round is not evidence and does not count toward the A2 two-round floor. Do NOT read R4 as support for down-routing either — a saturated card cannot tell you what the expensive tiers are for, and the cheap tiers being cheaper per passed task on a card nothing failed is an artifact of the card, not a finding. R5 needs a genuinely separating card, which per the R4 receipt review is gated on the cross-family judge (ROUTING-DOCTRINE.md roadmap item 2). Note also that R1-R3 contested claude-opus-4-8 while R4 contests claude-opus-5; the two series must not be pooled."
     },
     {
       "taskClass": "bulk-classification",

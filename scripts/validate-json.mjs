@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
  * Built on SIP — validates that lanes.json, routing-table.json, and every
- * scorecards/*.json parse as valid JSON, and that promptfooconfig.yaml
- * exists (existence-only — a full parse would require a YAML dependency
- * this repo doesn't otherwise carry; the eval harness itself is the real
- * validator for that file's contents). Cheap structural guard wired into
+ * scorecards/*.json, rounds/*.json and fixtures/deep-reasoning/*.json parse
+ * as valid JSON, and that promptfooconfig.yaml exists (existence-only — a
+ * full parse would require a YAML dependency this repo doesn't otherwise
+ * carry; the eval harness itself is the real validator for that file's
+ * contents). Cheap structural guard wired into
  * `npm test` + CI. Exits non-zero on the first failure so broken receipts
  * or a missing eval config never ship silently.
  */
@@ -19,10 +20,11 @@ const lanes = join(ROOT, "lanes.json");
 if (existsSync(lanes)) jsonTargets.push(lanes);
 const routingTable = join(ROOT, "routing-table.json");
 if (existsSync(routingTable)) jsonTargets.push(routingTable);
-const scorecardsDir = join(ROOT, "scorecards");
-if (existsSync(scorecardsDir)) {
-  for (const f of readdirSync(scorecardsDir)) {
-    if (f.endsWith(".json")) jsonTargets.push(join(scorecardsDir, f));
+for (const dir of ["scorecards", "rounds", join("fixtures", "deep-reasoning")]) {
+  const abs = join(ROOT, dir);
+  if (!existsSync(abs)) continue;
+  for (const f of readdirSync(abs)) {
+    if (f.endsWith(".json")) jsonTargets.push(join(abs, f));
   }
 }
 
