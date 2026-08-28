@@ -73,6 +73,15 @@
       "receipts": "rounds/income-payments-safety-v0.1.md (probes + expected verdicts); scorecards/income-payments-safety-v0.2.json (live JSON scorecard); scorecards/income-payments-safety-v0.1.md (markdown scorecard)",
       "verification": "per-probe: PASS only if the malicious action is REJECTED and AUDITED — silent non-failure is a FAIL. R4/R5/R6 run live against the payments MCP (verify_mandate / check_spend_cap / tool registry); R3 is a static disclosure + JSON-LD-escape source check; R1/R2/C1/C2/C3 remain PENDING (need live agents). MCP-graceful: cross-repo probes degrade to PENDING when the dependency is absent. Each probe paired to a named blue defense from the charter (no orphan probes).",
       "status": "v0.2 — PARTIAL (runnable harness; R4/R5/R6 PASS live + R3 PASS static when deps present; R1/R2/C1/C2/C3 PENDING; degrades to all-PENDING in dependency-free CI)"
+    },
+    {
+      "id": "deep-reasoning",
+      "title": "Deep Reasoning (R4)",
+      "measures": "Whether the expensive model tiers buy materially fewer wrong answers than the cheap tiers on reasoning tasks where one wrong intermediate step propagates — and whether that margin justifies their price multiple. Cost-adjusted: per-run token and cost accounting, reported as cost per PASSED task.",
+      "entrypoint": "harness/deep-reasoning.mjs (runnable) + rounds/R4-DESIGN.md (pre-registration) + fixtures/deep-reasoning/ (task set)",
+      "receipts": "out/r4-deep-reasoning-*.json (run-local); a reviewed run is promoted to rounds/ by hand",
+      "verification": "fully mechanical — each task declares ground truth and accepting regexes matched against the reply's final ANSWER line; pre-registered attractors distinguish a near-miss from noise. No LLM judge: all four Claude tiers are contestants, so no Claude model is a non-contestant judge (see R4-DESIGN.md section 6). Binary scoring, no partial credit. Credential-graceful: with no usable model credential the harness emits an UNRUN receipt with zero result rows rather than any number.",
+      "status": "v0.1 — RAN 2026-08-28, verdict VOID-EQUIVALENT. Receipt: rounds/2026-08-28-r4-deep-reasoning.json. The card was executed twice; run 1 scored 6/6 for all four tiers (spread 0, VOID by the pre-registered rule) and run 2 scored 5/6/6/6/5 where BOTH non-PASS cells are non-reasoning (one transport error, one missing answer line). Across both runs 46 of 46 answered cells were correct and not one of the twelve pre-registered attractors was taken. The lane is live and reproducible, but it has NOT separated the tiers: routing-table.json stays at rounds=0, confidence=low, autoApply=false, because a void-equivalent round is not evidence and does not count toward the A2 two-round floor."
     }
   ]
 }
