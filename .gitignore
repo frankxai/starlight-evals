@@ -5,3 +5,7 @@ node_modules/
 # append-only audit log + spend ledger to .payments-data/ relative to cwd.
 # These are run-local receipts, never committed to the evals mirror.
 .payments-data/
+
+# ASPH checkpoint scratch — never publish; sweeping this in makes each
+# patch nest the previous one (recursive growth, see LN-002 defect class).
+.asph-wip/
