@@ -1,5 +1,5 @@
 {
-  "$comment": "Built on SIP — R4 deep-reasoning task fixture. Schema: r4-task v0.1.",
+  "$comment": "Built on SIP — R5 deep-reasoning task fixture. Schema: r5-task v0.1.",
   "id": "d1-deduction-trap-ledger",
   "family": "multi-step deduction with a trap intermediate step",
   "category": "sequential rule application, two interacting quantities, branch-flipping trap",

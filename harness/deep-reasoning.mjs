@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Built on SIP — R4 deep-reasoning lane harness (v0.1).
+ * Built on SIP — R5 deep-reasoning lane harness (v0.1).
  *
- * Runs the pre-registered R4 card (rounds/R4-DESIGN.md) across the four Claude
+ * Runs the pre-registered R5 card (rounds/R5-DESIGN.md) across the four Claude
  * tiers and emits a run receipt under out/ using the arena-run schema that
  * rounds/*.json already uses.
  *
@@ -16,7 +16,7 @@
  * SCORING
  *   Fully mechanical. Every task declares ground truth and a set of accepting
  *   regexes applied to the final `ANSWER:` line. There is no LLM judge on this
- *   card (see R4-DESIGN.md, Scoring: all four tiers are contestants, so no
+ *   card (see R5-DESIGN.md, Scoring: all four tiers are contestants, so no
  *   Claude model is a non-contestant judge). Scoring is binary per task; there
  *   is no partial credit. Answers that match a pre-registered attractor are
  *   recorded as FAIL-ATTRACTOR so a near-miss is distinguishable from noise.
@@ -41,7 +41,7 @@
  *   background Haiku call the CLI makes on every invocation.
  *
  * EFFORT
- *   Held constant across the three tiers that support it (see R4-DESIGN.md,
+ *   Held constant across the three tiers that support it (see R5-DESIGN.md,
  *   Effort). claude-haiku-4-5 does NOT accept output_config.effort at the API
  *   level, so no effort flag is sent for it and its row records
  *   effortApplied: null. This asymmetry is a stated limitation of the card, not
@@ -237,7 +237,7 @@ function runClaude({ prompt, model, effort, timeoutMs }) {
       // the background Haiku call the CLI makes on every invocation.
       // Prompt tokens are split across three buckets (uncached / cache-write /
       // cache-read). Reading only `inputTokens` under-reports by orders of
-      // magnitude — the first R4 run recorded in=2 for an 18.5K-token prompt,
+      // magnitude — the first R5 run recorded in=2 for an 18.5K-token prompt,
       // because the whole prompt had landed in the cache buckets. Sum all three.
       const mu = ev.modelUsage?.[model] ?? null;
       const usage = mu
@@ -309,16 +309,16 @@ function writeReceipt(scorecard, outPath) {
 function unrunReceipt(ranAt, reason, contestants, tasks, effort) {
   return {
     $comment:
-      "Built on SIP — Starlight Model Arena run receipt. Schema: arena-run v0.3 (R4 deep-reasoning). " +
+      "Built on SIP — Starlight Model Arena run receipt. Schema: arena-run v0.3 (R5 deep-reasoning). " +
       "STATUS: UNRUN. The lane is specified and the card is built, but no model was called, so this receipt " +
       "carries ZERO results. Nothing here may be read as evidence. Do not derive a routing rule from it.",
-    runId: `arena-${ranAt}-r4-deep-reasoning-UNRUN`,
+    runId: `arena-${ranAt}-r5-deep-reasoning-UNRUN`,
     date: ranAt,
     status: "UNRUN",
     unrunReason: reason,
     card: "round-4-deep-reasoning: 6 tasks, fully mechanical verification, cost-adjusted",
     lane: "deep-reasoning",
-    design: "rounds/R4-DESIGN.md",
+    design: "rounds/R5-DESIGN.md",
     harness: "harness/deep-reasoning.mjs (claude CLI print mode)",
     effortRequested: effort,
     contestants: Object.fromEntries(contestants.map((c) => [c.key, c.model])),
@@ -341,7 +341,7 @@ async function main() {
   const contestants = args.models ? CONTESTANTS.filter((c) => args.models.includes(c.key)) : CONTESTANTS;
   const outPath = args.out
     ? resolve(args.out)
-    : join(REPO_ROOT, "out", `r4-deep-reasoning-${ranAt}.json`);
+    : join(REPO_ROOT, "out", `r5-deep-reasoning-${ranAt}.json`);
 
   if (!tasks.length) {
     console.error(`no task fixtures found under ${FIXTURE_DIR}`);
@@ -349,7 +349,7 @@ async function main() {
   }
 
   console.log(`\nR4 deep-reasoning lane — ${tasks.length} task(s) x ${contestants.length} contestant(s)`);
-  console.log(`design: rounds/R4-DESIGN.md   effort requested: ${args.effort}\n`);
+  console.log(`design: rounds/R5-DESIGN.md   effort requested: ${args.effort}\n`);
 
   if (args.dryRun) {
     for (const t of tasks) {
@@ -475,16 +475,16 @@ async function main() {
 
   const scorecard = {
     $comment:
-      "Built on SIP — Starlight Model Arena run receipt. Schema: arena-run v0.3 (R4 deep-reasoning). " +
-      "Round 4 = the deep-reasoning lane R3 named as its own missing weakness. Fully mechanical verification, " +
-      "cost-adjusted. Pre-registered design: rounds/R4-DESIGN.md — written before any of these numbers existed.",
-    runId: `arena-${ranAt}-r4-deep-reasoning`,
+      "Built on SIP — Starlight Model Arena run receipt. Schema: arena-run v0.3 (R5 deep-reasoning). " +
+      "Round 5 = the deep-reasoning lane R3 named as its own missing weakness. Fully mechanical verification, " +
+      "cost-adjusted. Pre-registered design: rounds/R5-DESIGN.md — written before any of these numbers existed.",
+    runId: `arena-${ranAt}-r5-deep-reasoning`,
     date: ranAt,
     status: "RAN",
     verdict,
     card: "round-4-deep-reasoning: 6 tasks across 5 families where one wrong intermediate step propagates; fully mechanical verification; per-run token and cost accounting",
     lane: "deep-reasoning",
-    design: "rounds/R4-DESIGN.md",
+    design: "rounds/R5-DESIGN.md",
     harness: "harness/deep-reasoning.mjs — claude CLI print mode, default system prompt replaced",
     method:
       "Each task is dispatched independently to every contestant with a minimal replaced system prompt and no tools. " +
@@ -505,7 +505,7 @@ async function main() {
       tally: Object.fromEntries(Object.entries(perTier).map(([k, v]) => [k, `${v.passed}/${v.of}`])),
       headline:
         verdict === "VOID"
-          ? `VOID — every contestant scored ${passCounts[0]}/${tasks.length}. The card did not separate the tiers, so it yields no routing evidence. Per the pre-registered rule in R4-DESIGN.md this is a design failure, not a finding: redesign the card before R5.`
+          ? `VOID — every contestant scored ${passCounts[0]}/${tasks.length}. The card did not separate the tiers, so it yields no routing evidence. Per the pre-registered rule in R5-DESIGN.md this is a design failure, not a finding: redesign the card before R6.`
           : `Separation of ${separation} task(s) between the best and worst tier. Read summary.perTier for the cost-adjusted comparison; a single round sets confidence to at most medium under the A2 sample floor.`,
       caveats: [
         "n=1 per (task, contestant) cell — directional, not statistical.",

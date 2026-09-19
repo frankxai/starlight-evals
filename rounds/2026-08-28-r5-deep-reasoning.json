@@ -1,12 +1,12 @@
 {
-  "$comment": "Built on SIP — Starlight Model Arena run receipt. Schema: arena-run v0.3 (R4 deep-reasoning). Round 4 = the deep-reasoning lane R3 named as its own missing weakness. Fully mechanical verification, cost-adjusted. Pre-registered design: rounds/R4-DESIGN.md — written before any of these numbers existed. THIS FILE IS A REVIEWED PROMOTION of the harness receipt for run 2, with a review block and a full prior-run disclosure appended. No harness-emitted field was altered.",
-  "runId": "arena-2026-08-28-r4-deep-reasoning",
+  "$comment": "Built on SIP — Starlight Model Arena run receipt. Schema: arena-run v0.3 (R5 deep-reasoning). Round 5 = the deep-reasoning lane R3 named as its own missing weakness. Fully mechanical verification, cost-adjusted. Pre-registered design: rounds/R5-DESIGN.md — written before any of these numbers existed. THIS FILE IS A REVIEWED PROMOTION of the harness receipt for run 2, with a review block and a full prior-run disclosure appended. No harness-emitted field was altered.",
+  "runId": "arena-2026-08-28-r5-deep-reasoning",
   "date": "2026-08-28",
   "status": "RAN",
   "verdict": "MEASURED",
   "card": "round-4-deep-reasoning: 6 tasks across 5 families where one wrong intermediate step propagates; fully mechanical verification; per-run token and cost accounting",
   "lane": "deep-reasoning",
-  "design": "rounds/R4-DESIGN.md",
+  "design": "rounds/R5-DESIGN.md",
   "harness": "harness/deep-reasoning.mjs — claude CLI print mode, default system prompt replaced",
   "method": "Each task is dispatched independently to every contestant with a minimal replaced system prompt and no tools. The reply's final ANSWER line is matched against pre-registered accepting regexes; a match against a pre-registered attractor is recorded as FAIL-ATTRACTOR. Binary scoring, no partial credit, no LLM judge.",
   "effort": {
@@ -583,7 +583,7 @@
         "sonnet": 5136,
         "haiku": 20045
       },
-      "outcome": "Every contestant passed every task. Zero FAIL, zero FAIL-ATTRACTOR, zero NO-ANSWER, zero ERROR. Under the pre-registered void rule (R4-DESIGN.md section 4) a spread of 0 is VOID: a design failure, not a finding."
+      "outcome": "Every contestant passed every task. Zero FAIL, zero FAIL-ATTRACTOR, zero NO-ANSWER, zero ERROR. Under the pre-registered void rule (R5-DESIGN.md section 4) a spread of 0 is VOID: a design failure, not a finding."
     }
   },
   "review": {
@@ -591,7 +591,7 @@
     "reviewedVerdict": "VOID-EQUIVALENT — no reasoning separation established",
     "reasoning": [
       "The harness stamped run 2 verdict=MEASURED because the mechanical spread is 1 task. The reviewed reading is that this does not clear the pre-registered bar, for two independent reasons.",
-      "First, R4-DESIGN.md section 9 pre-registers that a spread of exactly 1 is weak separation and must NOT move the route at n=1.",
+      "First, R5-DESIGN.md section 9 pre-registers that a spread of exactly 1 is weak separation and must NOT move the route at n=1.",
       "Second, and decisive: NEITHER non-PASS cell is a reasoning failure. haiku/d2 is a transport ERROR (TLS: self-signed certificate detected at the sandbox proxy), which section 9 already rules unusable for a routing change. fable/d4 is NO-ANSWER: the model reasoned but did not emit the required final ANSWER line, which is an output-discipline failure and is the same signature R1, R2 and R3 all recorded on that axis. Remove both non-reasoning cells and every tier is at 100% on every task it answered.",
       "Across both runs, 46 of 46 scored cells that produced an answer produced the CORRECT answer. Zero wrong answers. Not one of the twelve pre-registered attractors was taken by any tier — including claude-haiku-4-5 on the memorisation-inverting probability item and on the 300-section needle reconciliation."
     ],
@@ -600,8 +600,10 @@
     "costObservationNotAFinding": "With capability saturated, cost is the only axis that moved, and it moved against the expensive tiers. Cost per passed task in run 2: haiku $0.0157, sonnet $0.0101, opus $0.0207, fable $0.0360. In run 1: haiku $0.0239, sonnet $0.0279, opus $0.0698, fable $0.0665. Haiku reached the same answers using roughly 3-5x the output tokens of fable and was still cheaper. This is consistent with the doctrine rule that a saturated class routes to the cheapest passing tier, but it is NOT evidence for a routing change: a saturated card cannot tell you what the expensive tiers are for. Do not cite these numbers as a finding.",
     "whatWouldActuallySeparate": [
       "The tiers are no longer separated by whether they can solve well-posed deterministic problems. That capability is now common to the whole lineup, Haiku included.",
-      "This creates a methodological bind for R5: the tasks that plausibly still separate the frontier — open-ended synthesis, long-horizon multi-step agentic work, judgment under genuine ambiguity — are exactly the tasks with no mechanical ground truth, and R4 could not use a judge because all four tiers were contestants.",
-      "R5 therefore needs the cross-family judge from ROUTING-DOCTRINE.md roadmap item 2 before a harder card is worth building. Building a harder mechanical card first is likely to saturate again.",
+      "This creates a methodological bind for R6: the tasks that plausibly still separate the frontier — open-ended synthesis, long-horizon multi-step agentic work, judgment under genuine ambiguity — are exactly the tasks with no mechanical ground truth, and R5 could not use a judge because all four tiers were contestants.",
+      "AMENDED 2026-09-19 (round renumbered R4 -> R5; arena R4 is the 2026-06-10 work-samples card, which this mirror never received). The original text here read: 'R6 therefore needs the cross-family judge from ROUTING-DOCTRINE.md roadmap item 2 before a harder card is worth building.' That is wrong. Arena R4 already ran two blind Claude-family sonnet judges with shuffled per-task labels over real production work and recorded family bias as a stated caveat, not a blocker. R6 is NOT gated on the cross-family judge existing; that judge reduces a known bias rather than unlocking the method. Building a harder mechanical card first is still likely to saturate again.",
+      "AMENDED 2026-09-19: arena R4 also separated the tiers on an axis this card does not measure — discipline under load. Its recorded finding: 'Fable 5 violated an output contract for the first time across four rounds — when the task itself is heavy, its constraint edge narrows', with Opus at 5 of 7 structured-output tasks violated. This receipt classifies run 2 fable/d4 (correct chain, omitted ANSWER line, the heaviest multi-file task on the card) as non-reasoning and therefore noise. Against R4 it is not noise: it is a third independent instance of the same measured behaviour from the tier R4 named. The reasoning verdict is unchanged — no tier gave a wrong answer — but that cell is evidence on the output-discipline axis, not an absence of evidence.",
+      "AMENDED 2026-09-19: second cheap probe, alongside the effort sweep — re-score the replies this round already produced for OUTPUT-CONTRACT COMPLIANCE rather than correctness. Mechanical, no judge, no new spend, and it tests the one axis four rounds now agree on.",
       "Cheaper interim probe: hold this card fixed and sweep effort DOWNWARD. If every tier still passes at effort=low, the routing question stops being which tier and becomes which effort — and that saving is larger than any tier swap."
     ]
   }

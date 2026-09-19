@@ -1,5 +1,5 @@
 {
-  "$comment": "Built on SIP — R4 deep-reasoning task fixture. Schema: r4-task v0.1.",
+  "$comment": "Built on SIP — R5 deep-reasoning task fixture. Schema: r5-task v0.1.",
   "id": "d3-longctx-reconcile",
   "family": "long-context synthesis reconciling two facts placed far apart",
   "category": "two-needle reconciliation with a live decoy and ~300 near-miss distractors",

@@ -1,5 +1,5 @@
 {
-  "$comment": "Built on SIP — R4 deep-reasoning task fixture. Schema: r4-task v0.1.",
+  "$comment": "Built on SIP — R5 deep-reasoning task fixture. Schema: r5-task v0.1.",
   "id": "d6-constraint-backtrack-assignment",
   "family": "multi-step deduction — constraint satisfaction requiring backtracking",
   "category": "5x3 assignment, 10 constraints, unique solution, no single constraint pins a cell",

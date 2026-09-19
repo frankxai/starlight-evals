@@ -1,5 +1,5 @@
 {
-  "$comment": "Built on SIP — R4 deep-reasoning task fixture. Schema: r4-task v0.1.",
+  "$comment": "Built on SIP — R5 deep-reasoning task fixture. Schema: r5-task v0.1.",
   "id": "d2-attractor-random-reveal",
   "family": "plausible-but-wrong attractor answer",
   "category": "conditional probability where the memorized answer is the wrong answer",

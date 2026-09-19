@@ -1,6 +1,6 @@
-# R4 — Deep-Reasoning Lane: Pre-Registration
+# R5 — Deep-Reasoning Lane: Pre-Registration
 
-> Built on SIP. Written **before any R4 data was collected.** Nothing in this
+> Built on SIP. Written **before any R5 data was collected.** Nothing in this
 > document is a result. It is the design, the prediction, and the rule that
 > decides in advance what would falsify it.
 
@@ -16,7 +16,7 @@
 `confidence: "low"`, `rounds: 0`, and this evidence field:
 
 > Doctrine, NOT yet measured — no arena card has a deep-reasoning lane where Opus
-> ceiling would show. R4 must build it before this hardens.
+> ceiling would show. R5 must build it before this hardens.
 
 R3 named the same gap as its own weakness: its card "measures COMPLIANCE, not
 CAPABILITY CEILING." Every other class in the routing table has at least one
@@ -53,8 +53,8 @@ that passes one more task while costing four times as much has not supported H1.
 | `sonnet` | `claude-sonnet-5` | 2.00 | 10.00 | 1M |
 | `haiku` | `claude-haiku-4-5` | 1.00 | 5.00 | 200K |
 
-Exact model IDs, never date-suffixed. Note that R1–R3 ran `claude-opus-4-8`;
-R4 contests `claude-opus-5`, so R4 is **not** a continuation of the R1–R3 Opus
+Exact model IDs, never date-suffixed. Note that R1–R4 ran `claude-opus-4-8`;
+R5 contests `claude-opus-5`, so R5 is **not** a continuation of the R1–R4 Opus
 series and must not be pooled with it.
 
 ## 4. The critical design constraint: this card must not saturate
@@ -64,7 +64,7 @@ and the grounding task, and the routing table records why that is worth almost
 nothing: *"PASS by all 4 on ONE trivial task (palindrome) — saturation on an easy
 distribution."* A card that everything passes ranks nothing.
 
-R4's entire job is a task distribution hard enough to separate the tiers.
+R5's entire job is a task distribution hard enough to separate the tiers.
 Designing against ceiling effects is the primary constraint, above elegance and
 above coverage.
 
@@ -89,7 +89,7 @@ tasks** — every tier scores identically, whether 6/6 or 0/6 — the round is
 two-round floor, and does not change `routing-table.json`. The harness computes
 this itself and stamps `verdict: "VOID"`; it is not a judgment call made after
 seeing the numbers. A void round means the card was wrong and must be redesigned
-before R5.
+before R6.
 
 A spread of 1 task is weak separation and should be reported as such rather than
 narrated into a finding.
@@ -146,15 +146,15 @@ cannot physically receive is not a measurement of the cheap tier.
 ### No LLM judge on this card
 
 R1 used a blind non-contestant judge (`sonnet`) because only two tiers were
-contesting. **R4 contests all four Claude tiers, so no Claude model is a
+contesting. **R5 contests all four Claude tiers, so no Claude model is a
 non-contestant** and the R1 arrangement cannot be reproduced honestly. Rather
-than use a contestant to judge its own rivals, R4 is fully mechanical: the
+than use a contestant to judge its own rivals, R5 is fully mechanical: the
 architecture task was converted from a rubric-scored task into one with a
 determinate answer (§5, `d5`).
 
-The rubric-judged variant is **deferred to R5**, gated on the cross-family judge
+The rubric-judged variant is **deferred to R6**, gated on the cross-family judge
 already on the doctrine roadmap (`ROUTING-DOCTRINE.md`, roadmap item 2: GPT-5 via
-OpenRouter as a bias-free judge). Until that exists, R4 measures what can be
+OpenRouter as a bias-free judge). Until that exists, R5 measures what can be
 measured without a judge, and says so.
 
 ## 7. Effort as a controlled variable
@@ -163,7 +163,7 @@ Effort (`output_config.effort`) changes both quality and spend inside a single
 model. A cheap tier at `xhigh` may beat an expensive tier at `low`, which would
 change the routing conclusion entirely, so the choice must be explicit.
 
-**Decision: hold effort constant at `high` for R4. Do not sweep.**
+**Decision: hold effort constant at `high` for R5. Do not sweep.**
 
 Justification:
 
@@ -186,7 +186,7 @@ removed without either dropping Haiku or sending a parameter the API rejects.
 
 **What this round therefore does NOT establish:** the cost-adjusted effort
 frontier. "Is Sonnet at `xhigh` cheaper per correct answer than Opus at `high`?"
-is a live and valuable question that R4 does not answer. It is the natural R6.
+is a live and valuable question that R5 does not answer. It is the natural R7.
 
 ## 8. Cost accounting
 
@@ -213,24 +213,24 @@ Stated before the data exists. `S` = pass count out of 6.
 |---|---|---|
 | Spread = 0 | **VOID.** The card failed to separate. | No change. Redesign the card. Does not count toward the A2 floor. |
 | `S(opus) >= S(fable)` **and** `S(opus) - max(S(sonnet), S(haiku)) >= 2` **and** `costPerPassedTask(opus) < costPerPassedTask(fable)` | H1 supported, Opus is the efficient tier | **Keep `route: "opus"`.** Confidence low -> medium. Still `autoApply: false`; the A2 floor needs a second round. |
-| `S(fable) - S(opus) >= 2` **and** the extra passes are tasks Opus failed | Fable's 2x price buys capability Opus lacks | **Change to `route: "fable"`**, confidence medium, `autoApply: false`, pending R5. Record the specific tasks in the evidence field. |
+| `S(fable) - S(opus) >= 2` **and** the extra passes are tasks Opus failed | Fable's 2x price buys capability Opus lacks | **Change to `route: "fable"`**, confidence medium, `autoApply: false`, pending R6. Record the specific tasks in the evidence field. |
 | `max(S(sonnet), S(haiku)) >= S(opus)` | Saturation across tiers, same as R3's coding result | **Down-route** to the cheapest tier that matched, per the doctrine's core rule: "when a task-class is capability-saturated across tiers, route to the cheapest passing tier." Confidence medium at most. |
 | `S(opus) - max(S(sonnet), S(haiku)) == 1` | Weak separation | Report as weak. **Do not change the route on one task of difference at n=1.** |
 | Any tier with `errors > 0` | Incompletely measured | That tier's row is not usable for a routing change. |
 
 **Ceiling on any outcome.** Under A2, one round sets `confidence` to at most
-`medium` and leaves `autoApply: false`. **R4 cannot harden the deep-reasoning
-rule no matter how clean the result is.** R4 is round 1 of at least 2.
+`medium` and leaves `autoApply: false`. **R5 cannot harden the deep-reasoning
+rule no matter how clean the result is.** R5 is round 1 of at least 2.
 
-## 10. How R5 replicates this
+## 10. How R6 replicates this
 
-R4 is designed so R5 is a clean replication rather than a new experiment.
+R5 is designed so R6 is a clean replication rather than a new experiment.
 
 - **Same fixtures, unchanged.** Every task is deterministic: fixed prompts, and
   `d3` assembled by index arithmetic with no RNG and no clock, so the document is
   byte-identical between runs.
-- **Same command:** `npm run eval:r4`.
-- **Change exactly one thing at a time.** If R5 changes the contestant set, the
+- **Same command:** `npm run eval:r5`.
+- **Change exactly one thing at a time.** If R6 changes the contestant set, the
   effort level, or the transport, it is a different experiment and the two rounds
   are not concordant — they are two n=1 rounds of different things.
 - **Concordance** means the same routing consequence fires in §9 in both rounds,
@@ -246,14 +246,14 @@ pre-registration.
 
 1. **n=1 per cell.** Six tasks, one run each per tier. A single lucky or unlucky
    sample moves a tier by one task. This is the dominant weakness and it is not
-   fixed by R4; it is why the A2 floor exists.
+   fixed by R5; it is why the A2 floor exists.
 2. **Model-in-harness.** Runs go through the `claude` CLI, not the raw API. The
    system prompt is replaced to keep cost attributable, but this still measures
-   the model as the CLI runs it. R1–R3 carry the same caveat.
+   the model as the CLI runs it. R1–R4 carry the same caveat.
 3. **The Haiku effort asymmetry** (§7) is a real confound that cannot be removed.
 4. **Six tasks is a small distribution.** The families were chosen because they
    are known to separate reasoning tiers, which is a designed bias toward
-   separation — the mirror image of R3's bias toward compliance. R4 does not
+   separation — the mirror image of R3's bias toward compliance. R5 does not
    measure the tiers on average work; it measures them where reasoning depth is
    the binding constraint. That is the right target for this routing class and
    the wrong target for any other.
@@ -269,9 +269,9 @@ pre-registration.
 ## 12. Reproducing this round
 
 ```bash
-npm run eval:r4 -- --dry-run     # assemble every prompt, spend nothing
-npm run eval:r4                  # full card, 6 tasks x 4 tiers, effort=high
-npm run eval:r4 -- --tasks d2,d6 --models opus,haiku    # subset
+npm run eval:r5 -- --dry-run     # assemble every prompt, spend nothing
+npm run eval:r5                  # full card, 6 tasks x 4 tiers, effort=high
+npm run eval:r5 -- --tasks d2,d6 --models opus,haiku    # subset
 ```
 
 The harness writes a run-local receipt to `out/`. It never writes to `rounds/`;
@@ -293,8 +293,8 @@ Built on SIP — Starlight Intelligence Protocol.
 **Nothing above this line was changed after data existed.** This section records
 the outcome and is not part of the pre-registration.
 
-R4 ran on 2026-08-28. Receipt:
-[`2026-08-28-r4-deep-reasoning.json`](2026-08-28-r4-deep-reasoning.json).
+R5 ran on 2026-08-28. Receipt:
+[`2026-08-28-r5-deep-reasoning.json`](2026-08-28-r5-deep-reasoning.json).
 **Verdict: VOID-EQUIVALENT. The card saturated.**
 
 - **Run 1:** every tier scored 6/6. Spread 0 — VOID by the §4 rule.
@@ -318,15 +318,49 @@ still unmeasured — the difference is that it is now unmeasured for a *known*
 reason: on well-posed, ground-truth-checkable reasoning problems this lineup has
 no ceiling left to find, Haiku included.
 
-That result creates the bind R5 has to solve, and it is recorded in the receipt's
+That result creates a bind for R6, recorded in the receipt's
 `review.whatWouldActuallySeparate`: the tasks that plausibly still separate the
 frontier are the ones with no mechanical ground truth, and §6 could not use a
 judge because all four tiers were contestants. Building a harder *mechanical*
-card is likely to saturate again. R5 should wait on the cross-family judge
-(`ROUTING-DOCTRINE.md` roadmap item 2), and in the meantime the cheaper probe is
-to hold this card fixed and sweep effort **downward** — if every tier still
-passes at `effort: low`, the live routing question is which effort, not which
-tier.
+card is likely to saturate again.
+
+### Correction — 2026-09-19: this round was renumbered R4 → R5, and the real R4 changes the conclusion
+
+The arena's fourth round already existed when this card was designed:
+`tools/arena/runs/2026-06-10-r4-work-samples.json` in
+`Starlight-Intelligence-System`, a premium work-sample card run 2026-06-10. This
+design took its number from *this mirror's* `rounds/`, which stops at R3 and
+never received arena R4 or the 2026-06-12 Grok/Composer model-lane run. The round
+is R5. Two consequences, both cutting against the paragraph above:
+
+1. **A blind non-contestant judge was already available, and already used.** R4
+   ran two Claude-family `sonnet` judges with per-task shuffled A/B labels over
+   real production tasks, recording family bias as a stated caveat rather than a
+   blocker. R6 is therefore **not gated on the cross-family judge existing** — that
+   judge would reduce a known bias, not unlock the method. The better reason to be
+   slow here is R4's own caveat: *"work-sample quality scores are single-judge
+   taste; repeat before routing on them."*
+
+2. **Real work already separated the tiers — on an axis this card does not
+   measure.** R4's finding was not correctness but *discipline under load*:
+   *"Fable 5 violated an output contract for the first time across four rounds —
+   when the task itself is heavy, its constraint edge narrows,"* with Opus at 5 of
+   7 structured-output tasks violated. R4's recorded routing implication was to
+   enforce output contracts structurally regardless of model.
+
+   That reframes run 2's `fable/d4` cell. The postscript above dismissed it as
+   "non-reasoning" and therefore noise. Against R4 it is not noise: it is a third
+   independent instance of the same measured behaviour, on the heaviest
+   multi-file task of the card, from the exact tier R4 named. The *reasoning*
+   verdict is unchanged — fable's chain was correct — but the cell is evidence on
+   the output-discipline axis, not an absence of evidence.
+
+So the cheap probe stands and a second joins it: hold this card fixed and sweep
+effort **downward** — if every tier still passes at `effort: low`, the live
+routing question is which effort, not which tier — and re-score the replies this
+round already produced a second way, for **output-contract compliance** rather
+than correctness. That is mechanical, needs no judge, costs nothing to re-run,
+and tests the one axis four rounds now agree on.
 
 **Do not tune these fixtures to manufacture separation.** The card saturating is
 the result. Editing tasks until a tier fails and calling that a finding is the

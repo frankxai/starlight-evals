@@ -1,10 +1,10 @@
-# R4 deep-reasoning task fixtures
+# R5 deep-reasoning task fixtures
 
-> Built on SIP. The task set for the R4 deep-reasoning lane. Pre-registered
-> design: [`../../rounds/R4-DESIGN.md`](../../rounds/R4-DESIGN.md). Runner:
+> Built on SIP. The task set for the R5 deep-reasoning lane. Pre-registered
+> design: [`../../rounds/R5-DESIGN.md`](../../rounds/R5-DESIGN.md). Runner:
 > [`../../harness/deep-reasoning.mjs`](../../harness/deep-reasoning.mjs).
 
-One JSON file per task, schema `r4-task v0.1`. Every fixture is self-contained:
+One JSON file per task, schema `r5-task v0.1`. Every fixture is self-contained:
 a reader can check the ground truth without running anything.
 
 | Field | Meaning |
@@ -37,9 +37,9 @@ a reader can check the ground truth without running anything.
 - **Do not tune a task because a tier failed it.** These fixtures describe the
   reasoning distribution; they are not targets. Editing a task after seeing a
   result and then re-running is how a card stops measuring anything.
-- **Changing any fixture breaks replication.** R5 is a clean replication of R4
+- **Changing any fixture breaks replication.** R6 is a clean replication of R5
   only if the card is byte-identical. A changed card is a new experiment and its
-  round is not concordant with R4 — it is a second n=1 round of something else.
+  round is not concordant with R5 — it is a second n=1 round of something else.
 - Ground truths for `d1`, `d5` and `d6` were produced by reference
   implementations rather than by hand; `d6`'s uniqueness was established by
   exhaustive search over all 14,400 candidate grids.
