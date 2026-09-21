@@ -40,7 +40,7 @@ The eval loop *is* the cost-optimization engine — they are not separate projec
   expensive tier buys nothing. Coding + grounding → Haiku (R3). This is the single
   biggest lever and it is already evidenced.
 - **Reserve the expensive tiers for where they win.** Fable for constrained-output /
-  pipeline work (3 rounds concordant); Opus for deep reasoning (pending R4).
+  pipeline work (3 rounds concordant); Opus for deep reasoning (pending R5 — the deep-reasoning round; arena R4 was the 2026-06-10 work-samples card).
 - **Cost ceilings are circuit-breakers.** The Cost Plane carries daily USD caps
   (Anthropic $20, Vercel $5 in the template) with WoW/MoM spike factors. Breach →
   the Queen falls back to the safe default and flags, rather than spending blind.
@@ -75,7 +75,7 @@ the safe default and all auto-routing stops. One flag.
 - **Monthly** — full system scorecard (the `StarlightProvingGround` scheduled task).
 - **Weekly lightweight tick** — a single arena round on the cheapest-tier candidate
   for one task-class, to catch capability drift between full runs (proposed; wire as a
-  scheduled task once R4 lands).
+  scheduled task once R5 lands).
 
 ## Improvement Ledger (A3 — binding)
 
@@ -86,7 +86,7 @@ Every routing change is appended here: date · class · old→new · evidence ·
 | 2026-06-10 | constrained-output | (none→) route=fable, confidence=high | R1+R2+R3 concordant output-discipline | revert: drop class |
 | 2026-06-10 | codegen | (none→) route=haiku, confidence=medium | R3 saturation; Haiku=Opus on coding | revert: route=fable |
 | 2026-06-10 | grounding-extraction | (none→) route=haiku, confidence=medium | R3 saturation; none fabricated | revert: route=fable |
-| 2026-06-10 | deep-reasoning | (none→) route=opus, confidence=low, autoApply=false | doctrine only — UNMEASURED, awaiting R4 | n/a (not auto) |
+| 2026-06-10 | deep-reasoning | (none→) route=opus, confidence=low, autoApply=false | doctrine only — UNMEASURED, awaiting the deep-reasoning round (which landed as R5, not R4 — R4 was work-samples) | n/a (not auto) |
 | 2026-06-10 | codegen, grounding-extraction, bulk-classification | autoApply true→**false** | A2 correction: exec board found these auto-routing on n=1 trivial-task evidence, violating the ≥2-round floor. Now suggestion-only. | revert when 2nd round confirms |
 
 ## What else to consider (the roadmap)
