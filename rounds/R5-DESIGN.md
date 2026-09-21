@@ -357,10 +357,25 @@ is R5. Two consequences, both cutting against the paragraph above:
 
 So the cheap probe stands and a second joins it: hold this card fixed and sweep
 effort **downward** — if every tier still passes at `effort: low`, the live
-routing question is which effort, not which tier — and re-score the replies this
-round already produced a second way, for **output-contract compliance** rather
-than correctness. That is mechanical, needs no judge, costs nothing to re-run,
-and tests the one axis four rounds now agree on.
+routing question is which effort, not which tier.
+
+The second probe named here in an earlier revision — *"re-score the replies this
+round already produced for output-contract compliance"* — **is not executable, and
+that claim was wrong.** Checked 2026-09-21: `score()` receives the raw reply but
+persists only the extracted, normalised answer, so the receipt has nothing left to
+re-score. Every `answer` in it is conformant by construction, and the two non-PASS
+cells (`fable/d4` NO-ANSWER, `haiku/d2` transport ERROR) hold no text at all.
+
+The gap is fixed upstream instead, where the harness lives:
+[`Starlight-Intelligence-System#191`](https://github.com/frankxai/Starlight-Intelligence-System/pull/191)
+adds `contractCheck()`, scoring the two clauses `ANSWER_INSTRUCTION` already
+demands and never checked — exactly one final `ANSWER:` line ("a single final
+line") with nothing after it ("Nothing may follow that line"). `extractAnswer`
+takes the *last* match, so extra answer lines and trailing prose passed silently.
+It is a second axis, never touching PASS/FAIL, computed from output the harness
+already holds, so it costs no extra model call. The axis is measured from the next
+run forward; backfilling these two runs would mean paying to re-run a card that a
+single new run measures anyway.
 
 **Do not tune these fixtures to manufacture separation.** The card saturating is
 the result. Editing tasks until a tier fails and calling that a finding is the
