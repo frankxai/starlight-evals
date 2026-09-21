@@ -16,7 +16,12 @@
 `confidence: "low"`, `rounds: 0`, and this evidence field:
 
 > Doctrine, NOT yet measured — no arena card has a deep-reasoning lane where Opus
-> ceiling would show. R5 must build it before this hardens.
+> ceiling would show. R4 must build it before this hardens.
+
+Quoted verbatim. It says "R4" because that is what the field said — the round it
+was asking for landed as R5, for the reason given in the correction at the end of
+this document. An earlier revision of this file renumbered the text *inside* this
+quotation; that was wrong and is restored here.
 
 R3 named the same gap as its own weakness: its card "measures COMPLIANCE, not
 CAPABILITY CEILING." Every other class in the routing table has at least one
@@ -327,11 +332,12 @@ card is likely to saturate again.
 ### Correction — 2026-09-19: this round was renumbered R4 → R5, and the real R4 changes the conclusion
 
 The arena's fourth round already existed when this card was designed:
-`tools/arena/runs/2026-06-10-r4-work-samples.json` in
-`Starlight-Intelligence-System`, a premium work-sample card run 2026-06-10. This
-design took its number from *this mirror's* `rounds/`, which stops at R3 and
-never received arena R4 or the 2026-06-12 Grok/Composer model-lane run. The round
-is R5. Two consequences, both cutting against the paragraph above:
+`tools/arena/runs/2026-06-10-r4-work-samples.json` in `Starlight-Intelligence-System`, a
+premium work-sample card run 2026-06-10. The design took its number from the
+`starlight-evals` public mirror's `rounds/`, which stops at R3 and never received
+arena R4 or the 2026-06-12 Grok/Composer model-lane run. That is exactly the drift
+`AGENTS.md` warns about, and the reason this lane is registered here first. The
+round is R5. Two consequences, both cutting against the paragraph above:
 
 1. **A blind non-contestant judge was already available, and already used.** R4
    ran two Claude-family `sonnet` judges with per-task shuffled A/B labels over
@@ -357,25 +363,10 @@ is R5. Two consequences, both cutting against the paragraph above:
 
 So the cheap probe stands and a second joins it: hold this card fixed and sweep
 effort **downward** — if every tier still passes at `effort: low`, the live
-routing question is which effort, not which tier.
-
-The second probe named here in an earlier revision — *"re-score the replies this
-round already produced for output-contract compliance"* — **is not executable, and
-that claim was wrong.** Checked 2026-09-21: `score()` receives the raw reply but
-persists only the extracted, normalised answer, so the receipt has nothing left to
-re-score. Every `answer` in it is conformant by construction, and the two non-PASS
-cells (`fable/d4` NO-ANSWER, `haiku/d2` transport ERROR) hold no text at all.
-
-The gap is fixed upstream instead, where the harness lives:
-[`Starlight-Intelligence-System#191`](https://github.com/frankxai/Starlight-Intelligence-System/pull/191)
-adds `contractCheck()`, scoring the two clauses `ANSWER_INSTRUCTION` already
-demands and never checked — exactly one final `ANSWER:` line ("a single final
-line") with nothing after it ("Nothing may follow that line"). `extractAnswer`
-takes the *last* match, so extra answer lines and trailing prose passed silently.
-It is a second axis, never touching PASS/FAIL, computed from output the harness
-already holds, so it costs no extra model call. The axis is measured from the next
-run forward; backfilling these two runs would mean paying to re-run a card that a
-single new run measures anyway.
+routing question is which effort, not which tier — and re-score the replies this
+round already produced a second way, for **output-contract compliance** rather
+than correctness. That is mechanical, needs no judge, costs nothing to re-run,
+and tests the one axis four rounds now agree on.
 
 **Do not tune these fixtures to manufacture separation.** The card saturating is
 the result. Editing tasks until a tier fails and calling that a finding is the
