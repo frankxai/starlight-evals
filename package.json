@@ -1,5 +1,5 @@
 {
-  "$comment": "Built on SIP — minimal harness package for the Starlight Evals red/blue lane. This repo is a public mirror; the harness runs the probes it can mechanically execute and emits a JSON scorecard.",
+  "$comment": "Built on SIP \u00e2\u20ac\u201d minimal harness package for the Starlight Evals red/blue lane. This repo is a public mirror; the harness runs the probes it can mechanically execute and emits a JSON scorecard.",
   "name": "starlight-evals",
   "version": "0.2.0",
   "private": true,
@@ -12,7 +12,9 @@
     "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs",
     "lint:skills": "node scripts/lint-skills.mjs",
     "eval:pf": "npx -y promptfoo@latest eval -c promptfooconfig.yaml",
-    "eval:r5": "node harness/deep-reasoning.mjs"
+    "eval:r5": "node harness/deep-reasoning.mjs",
+    "orchestration:test": "node --test harness/orchestration/pilot.test.mjs",
+    "orchestration:plan": "node harness/orchestration/pilot.mjs plan"
   },
   "engines": {
     "node": ">=22"
