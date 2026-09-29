@@ -1,0 +1,180 @@
+{
+  "id": "arcanea",
+  "name": "Arcanea",
+  "site": "https://arcanea.ai",
+  "avatar": {
+    "who": "Worldbuilder, fantasy writer, or anime-adjacent creator co-creating inside a living universe with canon",
+    "jobs": [
+      "write canon-consistent lore",
+      "generate consistent character art",
+      "keep voice elevated but usable"
+    ],
+    "sophistication": "medium-high; cares about consistency more than spectacle"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://arcanea.ai",
+    "crossLinks": [
+      "https://frankx.ai/research"
+    ]
+  },
+  "budget": {
+    "monthlyUsd": 60,
+    "perRunCapUsd": 15
+  },
+  "decision": {
+    "costCeiling": 1.5,
+    "minItems": 6
+  },
+  "comparators": {
+    "default": [
+      "claude-sonnet-5",
+      "gpt-5.5",
+      "gemini-3.5-pro"
+    ],
+    "previousGeneration": "claude-sonnet-5",
+    "openWeight": "kimi-k2.6"
+  },
+  "canonSource": ".arcanea/lore/CANON_LOCKED.md (arcanea repo). The 852 Hz Gate is Starweave per the 2026-08-14 ruling; 'Shift' is drift.",
+  "workflows": [
+    {
+      "id": "canon-lore",
+      "name": "Canon-consistent lore",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "ar-canon-grounding",
+              "prompt": "Canon excerpt (authoritative): 'The Gate at 852 Hz is Starweave, kept by Elara with the godbeast Vaelith. Older drafts call it Shift; that name is superseded.'\nQuestion: Name the 852 Hz Gate and its keeper. End with `ANSWER: <gate>, <keeper>`.",
+              "mechanical": [
+                {
+                  "type": "answerLine",
+                  "accept": [
+                    "^starweave\\s*,\\s*elara"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "ar-nero-not-evil",
+              "prompt": "In Arcanea canon, Nero is the Primordial Darkness and Father of Potential, and is not evil; Shadow is corrupted Void, the Dark Lord Malachar's perversion. Write two sentences introducing Nero to a new reader.",
+              "mechanical": [
+                {
+                  "type": "regexNone",
+                  "patterns": [
+                    "\\bNero\\b\\s+(is|was)\\s+(an?\\s+|the\\s+)?(evil|villain|wicked|malevolent)"
+                  ]
+                },
+                {
+                  "type": "regexAll",
+                  "patterns": [
+                    "potential"
+                  ]
+                },
+                {
+                  "type": "lineCount",
+                  "pattern": "\\S",
+                  "min": 1,
+                  "max": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "ar-parable",
+              "prompt": "Write a 180-240 word teaching parable for creators stuck mid-project, set at the Starweave Gate (852 Hz, keeper Elara). Voice: elevated but practical; the reader must leave with one concrete action. Do not use the words 'mystical' or 'magical'. End with a single line starting 'Practice:'.",
+              "mechanical": [
+                {
+                  "type": "wordRange",
+                  "min": 180,
+                  "max": 240
+                },
+                {
+                  "type": "regexAll",
+                  "patterns": [
+                    "Starweave",
+                    "^Practice:"
+                  ]
+                },
+                {
+                  "type": "regexNone",
+                  "patterns": [
+                    "\\bmystical\\b",
+                    "\\bmagical\\b",
+                    "\\bShift Gate\\b"
+                  ]
+                },
+                {
+                  "type": "bannedPhrases"
+                }
+              ],
+              "rubric": "Which parable is better craft for this universe: vivid, canon-consistent, and ends in an action a creator could do today? Penalize purple prose and generic fantasy tropes."
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "ar-continuity-audit",
+              "prompt": "Audit this draft for canon errors against the excerpt. Excerpt: 'Ten Gates. Foundation 174 Hz (Lyssandria), Flow 285 Hz (Leyla), Fire 396 Hz (Draconia), Heart 417 Hz (Maylinn), Voice 528 Hz (Alera), Sight 639 Hz (Lyria), Crown 741 Hz (Aiyami), Starweave 852 Hz (Elara), Unity 963 Hz (Ino), Source 1111 Hz (Shinkami).' Draft: 'Lyria guarded the Sight Gate at 852 Hz, while Elara kept the Shift Gate and Draconia burned at 528 Hz.' List each error as '- <claim> -> <correction>'.",
+              "mechanical": [
+                {
+                  "type": "lineCount",
+                  "pattern": "^\\s*-\\s.+->",
+                  "min": 3,
+                  "max": 5
+                },
+                {
+                  "type": "regexAll",
+                  "patterns": [
+                    "639",
+                    "Starweave",
+                    "396"
+                  ]
+                }
+              ],
+              "rubric": "Which audit catches every error with the correct fix and adds no false errors?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "character-art",
+      "name": "Character art",
+      "tiers": [
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "ar-guardian-card",
+              "modality": "image",
+              "prompt": "Portrait card, 2:3, of Elara, keeper of the Starweave Gate: silver-white hair, deep indigo robe woven with faint star threads, calm expression, cosmic teal and gold palette on near-black background. Bottom caption in clean serif text reading exactly: ELARA. No other text, no watermark.",
+              "aspect": "2:3",
+              "mechanical": [
+                {
+                  "type": "imageAspect",
+                  "ratio": "2:3",
+                  "tolerance": 0.06
+                },
+                {
+                  "type": "transcriptionMatch",
+                  "required": [
+                    "ELARA"
+                  ]
+                }
+              ],
+              "rubric": "Which card better matches the brief (hair, robe, palette, calm) with premium illustration quality and no anatomical or text artifacts?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

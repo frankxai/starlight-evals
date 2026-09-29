@@ -1,0 +1,111 @@
+# Built on SIP — Brand Lab: multi-brand model evaluation.
+#
+# static (always, zero cost): syntax, card validator, offline tests with an
+#   injected mock transport. No key, no network.
+# live (manual dispatch or monthly schedule, only when OPENROUTER_API_KEY is
+#   configured): runs the requested brand card(s) and uploads receipts as an
+#   artifact. It never commits — promotion into scorecards/ is a reviewed PR,
+#   same rule as the red/blue lane.
+#
+# Dispatch inputs arrive through env vars, never interpolated into the shell,
+# so a crafted input cannot inject a command.
+name: brand-lab
+
+on:
+  pull_request:
+    paths:
+      - "brand-lab/**"
+      - "harness/brand-lab.mjs"
+      - "harness/lib/**"
+      - "scripts/validate-brand-lab.mjs"
+      - "test/**"
+      - ".github/workflows/brand-lab.yml"
+  workflow_dispatch:
+    inputs:
+      brand:
+        description: "Brand id or 'all'"
+        required: true
+        default: "all"
+      candidate:
+        description: "Candidate model id from brand-lab/models.json"
+        required: true
+      comparators:
+        description: "Space-separated comparator ids (blank = each card's defaults; required for an estate verdict)"
+        required: false
+        default: ""
+      samples:
+        description: "Samples per task per model"
+        required: false
+        default: "3"
+      budget_usd:
+        description: "Hard spend cap for the whole dispatch (USD)"
+        required: false
+        default: "25"
+  schedule:
+    # 06:17 UTC on the 3rd of each month. Runs only when repo variable
+    # BRAND_LAB_CANDIDATE is set (the model currently under review).
+    - cron: "17 6 3 * *"
+
+concurrency:
+  group: brand-lab-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      - name: node --check
+        run: for f in harness/brand-lab.mjs harness/lib/*.mjs scripts/validate-brand-lab.mjs; do node --check "$f"; done
+      - name: Validate cards + registry
+        run: node scripts/validate-brand-lab.mjs
+      - name: Offline tests (mock transport)
+        run: node --test test/*.test.mjs
+      - name: Dry-run plan for every brand
+        run: node harness/brand-lab.mjs --brand all --candidate claude-sonnet-5.5 --dry-run
+
+  live:
+    needs: static
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && vars.BRAND_LAB_CANDIDATE != '') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LANGFUSE_HOST: ${{ secrets.LANGFUSE_HOST }}
+      LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+      LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
+      CLICKHOUSE_URL: ${{ secrets.CLICKHOUSE_URL }}
+      CLICKHOUSE_USER: ${{ secrets.CLICKHOUSE_USER }}
+      CLICKHOUSE_PASSWORD: ${{ secrets.CLICKHOUSE_PASSWORD }}
+      IN_BRAND: ${{ github.event.inputs.brand || 'all' }}
+      IN_CANDIDATE: ${{ github.event.inputs.candidate || vars.BRAND_LAB_CANDIDATE }}
+      IN_COMPARATORS: ${{ github.event.inputs.comparators || vars.BRAND_LAB_COMPARATORS }}
+      IN_SAMPLES: ${{ github.event.inputs.samples || '3' }}
+      IN_BUDGET: ${{ github.event.inputs.budget_usd || '25' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      - name: Run brand lab
+        run: |
+          set -eu
+          if [ -z "${OPENROUTER_API_KEY}" ]; then echo "OPENROUTER_API_KEY not configured — the run will emit UNRUN receipts."; fi
+          case "$IN_BRAND$IN_CANDIDATE$IN_COMPARATORS$IN_SAMPLES$IN_BUDGET" in *[!A-Za-z0-9._\ -]*) echo "rejecting unexpected characters in inputs"; exit 2;; esac
+          set -- --brand "$IN_BRAND" --candidate "$IN_CANDIDATE" --samples "$IN_SAMPLES" --budget-usd "$IN_BUDGET"
+          for c in $IN_COMPARATORS; do set -- "$@" --comparator "$c"; done
+          node harness/brand-lab.mjs "$@" --note "gha run ${GITHUB_RUN_ID}"
+      - name: Upload receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-lab-receipts
+          path: out/brand-lab/
+          retention-days: 90

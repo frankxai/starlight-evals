@@ -1,0 +1,103 @@
+{
+  "id": "frankx",
+  "name": "FrankX.ai",
+  "site": "https://frankx.ai",
+  "avatar": {
+    "who": "Founder-operator or senior creator running a one-to-ten person business who wants AI systems, not AI tips",
+    "jobs": ["turn expertise into a weekly publishing system", "choose a model stack by cost and fit", "ship a founder operating system without an engineering team"],
+    "sophistication": "high; allergic to hype, reads receipts"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://frankx.ai/llm-hub",
+    "crossLinks": ["https://frankx.ai/blog", "https://frankx.ai/research"]
+  },
+  "budget": { "monthlyUsd": 60, "perRunCapUsd": 15 },
+  "decision": { "costCeiling": 1.5, "minItems": 6 },
+  "comparators": { "default": ["claude-sonnet-5", "gpt-5.5", "gemini-3.5-pro"], "previousGeneration": "claude-sonnet-5", "openWeight": "deepseek-v4-pro" },
+  "workflows": [
+    {
+      "id": "founder-brief",
+      "name": "Founder operating brief",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "fx-title-discipline",
+              "prompt": "Write a 40-60 word bio for Frank Riemer for a conference program. Facts you may use: AI Architect; independent project FrankX.ai; builds AI operating systems for founders; has produced 12,000+ AI songs. He is not affiliated with Oracle. Output only the bio.",
+              "mechanical": [
+                { "type": "wordRange", "min": 40, "max": 60 },
+                { "type": "regexAll", "patterns": ["AI Architect"] },
+                { "type": "regexNone", "patterns": ["AI Systems Architect", "Oracle"] },
+                { "type": "bannedPhrases" }
+              ]
+            },
+            {
+              "id": "fx-cost-arithmetic",
+              "prompt": "A newsletter pipeline sends 1,200,000 input tokens and receives 300,000 output tokens per month. Model A costs $2 per million input and $10 per million output. Model B costs $0.75 input and $3.75 output. What is the monthly cost difference A minus B in USD? Show the working, then end with a single line `ANSWER: <number>`.",
+              "mechanical": [{ "type": "answerLine", "accept": ["^\\$?3\\.375$", "^\\$?3\\.38$"] }]
+            }
+          ]
+        },
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "fx-30-day-brief",
+              "prompt": "Create a one-page operating brief for a founder launching a private AI agent service for five beta clients in 30 days. Sections, in this order, as markdown H2: Scope, Non-goals, Week 1, Risks, Decision needed. No blog framing, no emoji, under 350 words.",
+              "mechanical": [
+                { "type": "regexAll", "patterns": ["^## Scope", "^## Non-goals", "^## Week 1", "^## Risks", "^## Decision needed"] },
+                { "type": "wordRange", "min": 120, "max": 350 },
+                { "type": "bannedPhrases" }
+              ],
+              "rubric": "Which brief would a skeptical senior founder act on this week? Prefer concrete, dated, owner-assigned actions and named risks over generic advice. Penalize filler and hedging."
+            },
+            {
+              "id": "fx-aeo-outline",
+              "prompt": "Outline a blog post titled 'Which model should run my content pipeline?' for founders. Provide 5-7 H2 headings phrased as questions a reader would type into an answer engine, each followed by one sentence stating the answer the section gives. Markdown only.",
+              "mechanical": [
+                { "type": "lineCount", "pattern": "^## .+\\?$", "min": 5, "max": 7 },
+                { "type": "bannedPhrases" }
+              ],
+              "rubric": "Which outline answers the founder's real decision faster, with headings that match how people actually query answer engines? Penalize vague or duplicated sections."
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "fx-stack-tradeoff",
+              "prompt": "A solo creator publishes 3 long posts and 20 social variants a week, cares most about voice fidelity, and has a $40/month model budget. Recommend a two-model routing (drafting vs variants), state what you'd measure in the first two weeks to know it's working, and name the one condition that would make you switch. Under 250 words.",
+              "mechanical": [{ "type": "wordRange", "min": 80, "max": 250 }, { "type": "bannedPhrases" }],
+              "rubric": "Which recommendation shows better judgment: realistic within budget, measurable success criteria, a falsifiable switch condition? Penalize brand-name dropping without reasoning."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hero-visual",
+      "name": "Blog hero visual",
+      "tiers": [
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "fx-hero-legible",
+              "modality": "image",
+              "prompt": "Minimal dark editorial hero image, 16:9, deep navy background, a single thin cyan line diagram of three connected nodes. Large clean sans-serif title text reading exactly: MODEL LAB. No other text.",
+              "aspect": "16:9",
+              "mechanical": [
+                { "type": "imageAspect", "ratio": "16:9", "tolerance": 0.06 },
+                { "type": "transcriptionMatch", "required": ["MODEL LAB"] }
+              ],
+              "rubric": "Which image would pass as a premium editorial hero for a technical founder audience: restraint, legibility, no visual clutter, no stock-AI cliches?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

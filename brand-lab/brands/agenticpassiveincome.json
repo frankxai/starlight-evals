@@ -1,0 +1,71 @@
+{
+  "id": "agenticpassiveincome",
+  "name": "Agentic Passive Income",
+  "site": "https://agenticpassiveincome.com",
+  "avatar": {
+    "who": "Creator or professional packaging knowledge into templates, courses and small digital products that agents help maintain",
+    "jobs": ["scope a sellable digital product", "write a sales page without false claims", "plan maintenance so 'passive' stays honest"],
+    "sophistication": "medium; needs clarity more than theory"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://agenticpassiveincome.com",
+    "crossLinks": ["https://agenticincome.ai"]
+  },
+  "budget": { "monthlyUsd": 30, "perRunCapUsd": 8 },
+  "decision": { "costCeiling": 1.5, "minItems": 6 },
+  "comparators": { "default": ["claude-haiku-4.5", "gpt-5.5", "gemini-3.7-flash"], "previousGeneration": "claude-sonnet-5", "openWeight": "gpt-oss-120b" },
+  "workflows": [
+    {
+      "id": "digital-product",
+      "name": "Digital product build",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "api-pricing-math",
+              "prompt": "A template sells for $29. The payment processor takes 5% + $0.50 per sale. How many sales are needed to net at least $1,000? Show working, end with `ANSWER: <integer>`.",
+              "mechanical": [{ "type": "answerLine", "accept": ["^37$"] }]
+            },
+            {
+              "id": "api-product-json",
+              "prompt": "Scope a Notion template product for freelance video editors. Return JSON with keys: name, buyer, problem, deliverables (array, 3-6 items), price_usd (number), maintenance_hours_per_month (number). JSON only.",
+              "mechanical": [{ "type": "jsonKeys", "keys": ["name", "buyer", "problem", "deliverables", "price_usd", "maintenance_hours_per_month"] }]
+            }
+          ]
+        },
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "api-sales-page",
+              "prompt": "Write a 150-220 word sales section for a 'Client Onboarding Kit' template for freelance designers. Include who it is for, what is inside, and who it is NOT for. No income claims, no fake testimonials, no countdown urgency.",
+              "mechanical": [
+                { "type": "wordRange", "min": 140, "max": 230 },
+                { "type": "regexAll", "patterns": ["not for"] },
+                { "type": "regexNone", "patterns": ["make \\$", "earn \\$", "only \\d+ left", "limited time", "\"[^\"]+\"\\s*[-—]\\s*[A-Z][a-z]+"] },
+                { "type": "bannedPhrases" }
+              ],
+              "rubric": "Which section would convert a skeptical freelancer honestly: specific contents, clear exclusions, no manipulation?"
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "api-passive-honesty",
+              "prompt": "A reader asks: 'Can I set up an AI-run template shop and never touch it again?' Answer in 120-180 words with the real maintenance load, what an agent can and cannot safely do, and one weekly 20-minute routine.",
+              "mechanical": [
+                { "type": "wordRange", "min": 110, "max": 190 },
+                { "type": "regexNone", "patterns": ["^yes\\b", "never touch it again\\s*[.!]?$"] }
+              ],
+              "rubric": "Which answer is more honest and useful: names real maintenance (support, refunds, platform changes, updates), keeps humans on money and customer decisions?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

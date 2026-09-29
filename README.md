@@ -55,6 +55,7 @@ Start with:
 | Trace which lanes compose the score | [`lanes.json`](lanes.json) |
 | Validate published JSON receipts | `npm run validate` |
 | Run the current adversarial probe | `npm run probe` |
+| Test a new model across every brand workflow | [`brand-lab/README.md`](brand-lab/README.md) · `npm run lab -- --brand all --candidate <id> --dry-run` |
 | Publish my own scorecard | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
 
 Requirements: Node.js 22+ for the local harness scripts. No database, server, or private Starlight infrastructure is required for receipt validation. The adversarial probe degrades absent cross-repo dependencies to `PENDING`; if it finds a real checked defense failure, `STOP` and a nonzero exit are expected.
@@ -84,6 +85,7 @@ It is run by evaluator agents that hold the **Luminor kernel mindset** — Preci
 | **System** | the unifying scorecard + Overseer synthesis |
 | **Income & Payments Safety** (red/blue) | whether the income & payment stack rejects-and-audits 6 adversarial attack classes (R1–R6) — the L7 assurance lane *(v0.1, PENDING)* |
 | **Deep Reasoning** (R5) | whether the expensive model tiers buy fewer wrong answers than the cheap tiers where one wrong intermediate step propagates, cost-adjusted *(v0.1, ran 2026-08-28 — VOID-EQUIVALENT: the card saturated and separated nothing)* |
+| **Brand Lab** | whether a new text, image, or agent-harness model should be adopted for each brand's real workflows, against frontier, previous-generation, and open-weight comparators, per tier T1–T4, cost-adjusted, blind pairwise with bootstrap intervals — [`brand-lab/`](brand-lab/README.md) *(v0.1, UNRUN: harness + 10 seed cards)* |
 
 ## Latest scorecard — 2026-06-10 (v0.1)
 

@@ -1,0 +1,69 @@
+{
+  "id": "starlight",
+  "name": "Starlight Intelligence Systems",
+  "site": "https://starlightintelligence.org",
+  "avatar": {
+    "who": "Builder or agent engineer composing a persistent memory and routing layer for their own agents",
+    "jobs": ["route tasks to the cheapest passing model", "keep attestation honest", "recall the right memory atom under noise"],
+    "sophistication": "very high; reads schemas and source"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://starlightintelligence.org/research/",
+    "crossLinks": ["https://github.com/frankxai/starlight-evals", "https://github.com/frankxai/Starlight-Intelligence-System"]
+  },
+  "budget": { "monthlyUsd": 50, "perRunCapUsd": 12 },
+  "decision": { "costCeiling": 1.5, "minItems": 6 },
+  "comparators": { "default": ["claude-sonnet-5", "gpt-5.5", "qwen3.7-max"], "previousGeneration": "claude-sonnet-5", "openWeight": "kimi-k2.6" },
+  "workflows": [
+    {
+      "id": "routing",
+      "name": "Task-class routing",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "sl-route-json",
+              "prompt": "Classify each task into exactly one class from [codegen, grounding-extraction, constrained-output, deep-reasoning, creative]. Tasks: (1) 'Return the invoice fields as JSON matching this schema'; (2) 'Find the flaw in this 4-step proof'; (3) 'Write a myth about a river guardian'; (4) 'Summarize what the passage says about pricing'; (5) 'Fix the failing unit test'. Output only a JSON array of objects with keys id and class.",
+              "mechanical": [
+                { "type": "jsonKeys", "keys": ["id", "class"], "arrayMin": 5 },
+                { "type": "regexAll", "patterns": ["constrained-output", "deep-reasoning", "creative", "grounding-extraction", "codegen"] }
+              ]
+            },
+            {
+              "id": "sl-attestation-refusal",
+              "prompt": "You generated a plain grocery list for a user. It uses no Starlight Intelligence Protocol element. Should the output carry a 'Built on SIP' attestation block? Answer in one sentence with the reason, then `ANSWER: yes` or `ANSWER: no`.",
+              "mechanical": [{ "type": "answerLine", "accept": ["^no\\b"] }]
+            }
+          ]
+        },
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "sl-memory-grounding",
+              "prompt": "Memory atoms:\n[A1 2026-06-10] Decision: route constrained-output to Fable; Opus leaked past caps 3 rounds.\n[A2 2026-07-05] Memory lane: precision@10 baseline 0.20 on sovereign dog-off.\n[A3 2026-08-28] R5 deep-reasoning card pre-registered; no live results yet.\nQuestion: What is the current measured deep-reasoning result, and which atom supports your answer? If the atoms do not contain it, say so. Cite atom ids in brackets.",
+              "mechanical": [
+                { "type": "regexAll", "patterns": ["\\[A3\\]", "(no (live )?results|not (yet )?(measured|available)|does not contain|none)"] },
+                { "type": "regexNone", "patterns": ["\\b\\d{1,3}(\\.\\d+)?%"] }
+              ],
+              "rubric": "Which answer is more faithful to the atoms: refuses to invent a number, cites the right atom, and is concise?"
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "sl-saturation-call",
+              "prompt": "Three rounds show every model tier passing the grounding card (n=1 easy task each round). A teammate wants to auto-route all grounding to the smallest model now. Write the decision you'd log (<=150 words): accept, reject, or conditional — with the evidence standard you require.",
+              "mechanical": [{ "type": "wordRange", "min": 40, "max": 150 }, { "type": "bannedPhrases" }],
+              "rubric": "Which decision better respects evidence: recognizes saturation on an easy distribution is not proof, proposes a harder discriminating round, and keeps the change reversible?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

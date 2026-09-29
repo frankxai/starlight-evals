@@ -1,0 +1,66 @@
+{
+  "id": "gencreator",
+  "name": "GenCreator",
+  "site": "https://gencreator.ai",
+  "avatar": {
+    "who": "Expert creator with a trusted body of work who wants a week of content that still sounds like them",
+    "jobs": ["turn one trusted source into a content constellation", "keep every claim source-linked", "preserve voice across formats"],
+    "sophistication": "medium-high; protective of voice and credibility"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://gencreator.ai/research",
+    "crossLinks": ["https://gencreator.ai/factory"]
+  },
+  "budget": { "monthlyUsd": 50, "perRunCapUsd": 12 },
+  "decision": { "costCeiling": 1.5, "minItems": 6 },
+  "comparators": { "default": ["claude-sonnet-5", "gpt-5.5", "gemini-3.5-pro"], "previousGeneration": "claude-sonnet-5", "openWeight": "deepseek-v4-pro" },
+  "notes": "Public copy for GenCreator must not reference Oracle; tasks below avoid it.",
+  "workflows": [
+    {
+      "id": "creator-mission",
+      "name": "Source to week of content",
+      "tiers": [
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "gc-source-linked",
+              "prompt": "Source [S1]: 'Most creators fail at consistency, not ideas. I batch-record on Mondays, then cut one long video into five clips. My rule: never post a clip I would not watch twice.'\nSource [S2]: 'I stopped chasing trends in 2024. My audience grew slower but churned less.'\nWrite 3 LinkedIn posts (each 60-120 words) in the author's first-person voice. Every factual claim must end with its source tag [S1] or [S2]. Do not add statistics or claims not in the sources. Separate posts with a line containing only ---.",
+              "mechanical": [
+                { "type": "lineCount", "pattern": "^---$", "min": 2, "max": 2 },
+                { "type": "regexAll", "patterns": ["\\[S1\\]", "\\[S2\\]"] },
+                { "type": "regexNone", "patterns": ["\\b\\d{2,3}%", "\\b\\d+x\\b", "studies show", "research shows"] },
+                { "type": "bannedPhrases", "extra": ["journey", "10x", "grind", "deep-dive"] }
+              ],
+              "rubric": "Which set sounds more like one real person wrote it from these sources: specific, varied openings, no invented facts, no guru tone?"
+            },
+            {
+              "id": "gc-hooks",
+              "prompt": "From source [S1] 'I batch-record on Mondays, then cut one long video into five clips', write 5 short-video hooks (max 12 words each) as a numbered list 1-5. No questions that start with 'Did you know'. No emoji.",
+              "mechanical": [
+                { "type": "lineCount", "pattern": "^\\s*[1-5][.)]\\s+\\S", "min": 5, "max": 5 },
+                { "type": "regexNone", "patterns": ["did you know", "[\\u{1F300}-\\u{1FAFF}]"] }
+              ],
+              "rubric": "Which hooks would stop a scroll without clickbait, while staying true to the source?"
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "gc-review-gate",
+              "prompt": "Review this draft post against its source and return JSON with keys verdict ('approve' or 'revise'), unsupported_claims (array of strings), voice_issues (array of strings). Source [S1]: 'I batch-record on Mondays.' Draft: 'Batching on Mondays tripled my output and 80% of top creators do the same [S1]. Unlock your potential today!'",
+              "mechanical": [
+                { "type": "jsonKeys", "keys": ["verdict", "unsupported_claims", "voice_issues"] },
+                { "type": "regexAll", "patterns": ["\"verdict\"\\s*:\\s*\"revise\"", "(tripled|80%)"] }
+              ],
+              "rubric": "Which review catches every unsupported claim and the voice problem without inventing issues?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
