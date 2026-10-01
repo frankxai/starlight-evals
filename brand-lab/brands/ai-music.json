@@ -1,0 +1,97 @@
+{
+  "id": "ai-music",
+  "name": "AI Music (AI Music Academy / Music Lab)",
+  "site": "https://frankx.ai/music-lab",
+  "avatar": {
+    "who": "Independent producer or creator making AI-assisted tracks for release, sync, or content soundtracks",
+    "jobs": ["write Suno-ready prompts and lyrics", "master to platform loudness", "clear licensing before release"],
+    "sophistication": "medium; wants results that sound released, not demo"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://frankx.ai/music-lab",
+    "crossLinks": ["https://frankx.ai/music", "https://frankx.ai/blog"]
+  },
+  "budget": { "monthlyUsd": 40, "perRunCapUsd": 10 },
+  "decision": { "costCeiling": 1.5, "minItems": 6 },
+  "comparators": { "default": ["claude-sonnet-5", "gpt-5.5", "gemini-3.7-flash"], "previousGeneration": "claude-sonnet-5", "openWeight": "qwen3.7-max" },
+  "workflows": [
+    {
+      "id": "suno-prompting",
+      "name": "Suno prompt + lyrics",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "am-style-tags",
+              "prompt": "Write a Suno style prompt for a late-night lo-fi hip hop study track with warm Rhodes, vinyl crackle, and a slow 72 BPM swing. Rules: comma-separated tags only, 120 characters max, no artist or band names. Output only the tag line.",
+              "mechanical": [
+                { "type": "regexAll", "patterns": ["72", "(rhodes|electric piano)"] },
+                { "type": "regexNone", "patterns": ["nujabes", "j dilla", "lofi girl", "\\n.+"] },
+                { "type": "wordRange", "min": 4, "max": 25 }
+              ]
+            },
+            {
+              "id": "am-loudness",
+              "prompt": "Spotify normalizes playback loudness by default. What integrated loudness target in LUFS does Spotify's default normalization use? One sentence, then `ANSWER: <number> LUFS`.",
+              "mechanical": [{ "type": "answerLine", "accept": ["^-14\\s*LUFS"] }]
+            }
+          ]
+        },
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "am-lyric-structure",
+              "prompt": "Write lyrics for a 2:30 cinematic synthwave track about driving through a city at dawn after a hard year. Use Suno structure tags on their own lines: [Intro], [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Chorus], [Outro]. Chorus must be identical both times. No cliches like 'neon dreams' or 'set me free'.",
+              "mechanical": [
+                { "type": "regexAll", "patterns": ["^\\[Intro\\]", "^\\[Verse 1\\]", "^\\[Pre-Chorus\\]", "^\\[Verse 2\\]", "^\\[Outro\\]"] },
+                { "type": "lineCount", "pattern": "^\\[Chorus\\]", "min": 2, "max": 2 },
+                { "type": "regexNone", "patterns": ["neon dreams", "set me free"] }
+              ],
+              "rubric": "Which lyric is more singable and specific: concrete images, consistent meter per section, a chorus with a hook? Penalize generic imagery."
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "am-release-plan",
+              "prompt": "A creator has 40 finished AI-assisted tracks in three genres and wants income within 90 days without a label. Give a release and licensing plan in <=250 words: cadence, which tracks go to streaming vs sync libraries vs content licensing, what rights questions must be answered first, and one metric to watch weekly.",
+              "mechanical": [
+                { "type": "wordRange", "min": 100, "max": 250 },
+                { "type": "regexAll", "patterns": ["(rights|licens)", "sync"] },
+                { "type": "regexNone", "patterns": ["guarantee(d)? (income|revenue|streams)"] }
+              ],
+              "rubric": "Which plan is more executable and honest: realistic cadence, correct rights sequencing (terms of the generation platform first), no income promises?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cover-art",
+      "name": "Release cover art",
+      "tiers": [
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "am-cover-square",
+              "modality": "image",
+              "prompt": "Square 1:1 album cover for a lo-fi study EP: a small anime-style desk lamp glowing in a rainy window at night, soft purple and amber, film grain. Title text in small clean lowercase sans-serif, bottom left, reading exactly: night shift tapes. No other text.",
+              "aspect": "1:1",
+              "mechanical": [
+                { "type": "imageAspect", "ratio": "1:1", "tolerance": 0.03 },
+                { "type": "transcriptionMatch", "required": ["night shift tapes"] }
+              ],
+              "rubric": "Which cover would a listener click in a crowded playlist grid: mood match, readable at thumbnail size, no AI artifacts?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

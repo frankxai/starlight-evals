@@ -82,6 +82,15 @@
       "receipts": "out/r5-deep-reasoning-*.json (run-local); a reviewed run is promoted to rounds/ by hand",
       "verification": "fully mechanical — each task declares ground truth and accepting regexes matched against the reply's final ANSWER line; pre-registered attractors distinguish a near-miss from noise. No LLM judge: all four Claude tiers are contestants, so no Claude model is a non-contestant judge (see R5-DESIGN.md section 6). Binary scoring, no partial credit. Credential-graceful: with no usable model credential the harness emits an UNRUN receipt with zero result rows rather than any number.",
       "status": "v0.1 — RAN 2026-08-28, verdict VOID-EQUIVALENT. Receipt: rounds/2026-08-28-r5-deep-reasoning.json. The card was executed twice; run 1 scored 6/6 for all four tiers (spread 0, VOID by the pre-registered rule) and run 2 scored 5/6/6/6/5 where BOTH non-PASS cells are non-reasoning (one transport error, one missing answer line). Across both runs 46 of 46 answered cells were correct and not one of the twelve pre-registered attractors was taken. The lane is live and reproducible, but it has NOT separated the tiers: routing-table.json stays at rounds=0, confidence=low, autoApply=false, because a void-equivalent round is not evidence and does not count toward the A2 two-round floor."
+    },
+    {
+      "id": "brand-lab",
+      "title": "Brand Lab (multi-brand model adoption)",
+      "measures": "Whether a new model (text, image, or agent harness) should be adopted for each brand's real workflows, against other frontier models, the previous generation, and an open-weight option — cost-adjusted, per tier of complexity (T1 atomic, T2 composed, T3 expert judgment, T4 agentic).",
+      "entrypoint": "harness/brand-lab.mjs (runnable) + brand-lab/README.md (method + decision rule) + brand-lab/brands/*.json (10 cards) + brand-lab/models.json (registry)",
+      "receipts": "out/brand-lab/<runId>/{prereg,receipt}.json + calls.jsonl + judgments.jsonl (run-local); reviewed runs promoted to scorecards/brand-lab/ by PR",
+      "verification": "pre-registration hash written before any call; OpenRouter slugs resolved against the live catalog with provider fallbacks disabled; mechanical checks run first and forfeit a pair on violation; blind pairwise judging by two non-contestant-family judges in both A/B orders; paired bootstrap over tasks; safety-gate tasks override every verdict. No key => UNRUN with zero result rows.",
+      "status": "v0.1 — harness + 10 seed cards (47 tasks) shipped 2026-09-29; UNRUN (no live run yet). Seed cards are below the per-brand 6-task floor for most brands, so brand verdicts read UNDERPOWERED until cards grow; the estate-pooled verdict (--brand all with explicit comparators) is the first publishable unit."
     }
   ]
 }

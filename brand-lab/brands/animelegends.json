@@ -1,0 +1,99 @@
+{
+  "id": "animelegends",
+  "name": "Anime Legends",
+  "site": null,
+  "avatar": {
+    "who": "Anime fan-creator and mascot-IP builder producing consistent characters across posts, covers and shorts",
+    "jobs": ["keep one character on-model across many images", "render readable title cards", "write short in-world captions"],
+    "sophistication": "medium; very sensitive to off-model art"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": null,
+    "crossLinks": ["https://frankx.ai/research"]
+  },
+  "budget": { "monthlyUsd": 60, "perRunCapUsd": 15 },
+  "decision": { "costCeiling": 1.5, "minItems": 6 },
+  "comparators": { "default": ["gemini-flash-image", "gpt-image"], "previousGeneration": "gemini-flash-image", "openWeight": null },
+  "notes": "Image-first card. Candidate is an image model. Mascot IP carve-out applies: prompts use an original character only, never an existing franchise.",
+  "workflows": [
+    {
+      "id": "character-consistency",
+      "name": "On-model character",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "al-title-card",
+              "modality": "image",
+              "prompt": "Anime title card, 16:9, original character Kiro (short teal hair, white jacket with orange stripe, fox-shaped earring) standing on a rooftop at sunset. Bold clean title text centered at top reading exactly: KIRO RISING. No other text.",
+              "aspect": "16:9",
+              "mechanical": [
+                { "type": "imageAspect", "ratio": "16:9", "tolerance": 0.06 },
+                { "type": "transcriptionMatch", "required": ["KIRO RISING"] }
+              ]
+            },
+            {
+              "id": "al-square-post",
+              "modality": "image",
+              "prompt": "Square 1:1 anime illustration, original character Kiro (short teal hair, white jacket with orange stripe, fox-shaped earring) laughing in a ramen shop at night, warm lantern light. No text.",
+              "aspect": "1:1",
+              "mechanical": [{ "type": "imageAspect", "ratio": "1:1", "tolerance": 0.03 }]
+            }
+          ]
+        },
+        {
+          "tier": "T2",
+          "tasks": [
+            {
+              "id": "al-sheet",
+              "modality": "image",
+              "prompt": "Character turnaround sheet, 16:9, original character Kiro (short teal hair, white jacket with orange stripe, fox-shaped earring): front, three-quarter, side, back views on plain light grey background, consistent proportions. Small labels under each view reading exactly: FRONT, 3/4, SIDE, BACK.",
+              "aspect": "16:9",
+              "mechanical": [
+                { "type": "imageAspect", "ratio": "16:9", "tolerance": 0.06 },
+                { "type": "transcriptionMatch", "required": ["FRONT", "SIDE", "BACK"] }
+              ],
+              "rubric": "Which sheet keeps the character on-model across all four views (hair, jacket stripe, earring, proportions) with clean line quality?"
+            },
+            {
+              "id": "al-action-panel",
+              "modality": "image",
+              "prompt": "Single manga-style action panel, 2:3, original character Kiro (short teal hair, white jacket with orange stripe, fox-shaped earring) leaping between rooftops, dynamic speed lines, dramatic low angle. No text.",
+              "aspect": "2:3",
+              "mechanical": [{ "type": "imageAspect", "ratio": "2:3", "tolerance": 0.06 }],
+              "rubric": "Which panel has stronger composition and motion while keeping the character's identifying details correct and anatomy clean?"
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "al-caption-text",
+              "modality": "text",
+              "prompt": "Write 3 in-world captions (max 15 words each) for a post of Kiro leaping between rooftops. Numbered 1-3. Original character only; no references to existing anime franchises or characters.",
+              "mechanical": [
+                { "type": "lineCount", "pattern": "^\\s*[1-3][.)]\\s+\\S", "min": 3, "max": 3 },
+                { "type": "regexNone", "patterns": ["naruto", "goku", "luffy", "one piece", "dragon ball", "demon slayer"] }
+              ],
+              "rubric": "Which captions have more character voice and would earn a save or share from anime fans?"
+            },
+            {
+              "id": "al-banner",
+              "modality": "image",
+              "prompt": "Wide 3:1 channel banner, original character Kiro (short teal hair, white jacket with orange stripe, fox-shaped earring) on the right third, city skyline at dusk, empty calm space on the left for text. Channel name in clean bold letters on the left reading exactly: ANIME LEGENDS.",
+              "aspect": "3:1",
+              "mechanical": [
+                { "type": "imageAspect", "ratio": "3:1", "tolerance": 0.1 },
+                { "type": "transcriptionMatch", "required": ["ANIME LEGENDS"] }
+              ],
+              "rubric": "Which banner is more usable: safe text area, legible name, character on-model?"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

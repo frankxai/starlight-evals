@@ -1,0 +1,154 @@
+{
+  "id": "ai-architect",
+  "name": "AI Architect",
+  "site": "https://frankx.ai/ai-architect",
+  "avatar": {
+    "who": "Enterprise or solution architect deciding how to put LLMs into production under cost, latency and governance constraints",
+    "jobs": [
+      "write an ADR for model choice",
+      "size cost and latency",
+      "design RAG vs fine-tune vs agents",
+      "pass a security review"
+    ],
+    "sophistication": "very high; wants numbers and failure modes"
+  },
+  "publish": {
+    "hub": "https://frankx.ai/research/model-arena",
+    "brandSurface": "https://frankx.ai/ai-architect",
+    "crossLinks": [
+      "https://frankx.ai/llm-hub",
+      "https://frankx.ai/ai-architecture"
+    ]
+  },
+  "budget": {
+    "monthlyUsd": 80,
+    "perRunCapUsd": 20
+  },
+  "decision": {
+    "costCeiling": 2,
+    "minItems": 6
+  },
+  "comparators": {
+    "default": [
+      "claude-opus-5",
+      "gpt-5.5",
+      "gemini-3.5-pro"
+    ],
+    "previousGeneration": "claude-opus-5",
+    "openWeight": "deepseek-v4-pro"
+  },
+  "workflows": [
+    {
+      "id": "adr",
+      "name": "Architecture decision records",
+      "tiers": [
+        {
+          "tier": "T1",
+          "tasks": [
+            {
+              "id": "aa-latency-budget",
+              "prompt": "A voice agent must respond within 800 ms p95. Network + ASR take 320 ms, TTS first audio takes 180 ms. The model streams at 90 output tokens/s with 250 ms time-to-first-token. How many output tokens can the model emit before TTS must start, to stay within budget? Assume TTS starts after the first sentence completes. Show working, end with `ANSWER: <integer>`.",
+              "mechanical": [
+                {
+                  "type": "answerLine",
+                  "accept": [
+                    "^4$",
+                    "^4 tokens"
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "aa-adr-json",
+              "prompt": "Return an architecture decision record as JSON with exactly these keys: title, context, decision, alternatives (array), consequences (array), reversibility ('one-way' or 'two-way'). Topic: choosing retrieval-augmented generation over fine-tuning for a policy-document assistant that changes weekly. Output JSON only.",
+              "mechanical": [
+                {
+                  "type": "jsonKeys",
+                  "keys": [
+                    "title",
+                    "context",
+                    "decision",
+                    "alternatives",
+                    "consequences",
+                    "reversibility"
+                  ]
+                },
+                {
+                  "type": "regexAll",
+                  "patterns": [
+                    "two-way|one-way"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tier": "T3",
+          "tasks": [
+            {
+              "id": "aa-slo-tradeoff",
+              "prompt": "A bank wants a claims-triage assistant: 40k requests/day, p95 < 3 s, EU data residency, auditors need to reproduce any decision 12 months later. Propose the architecture in <=300 words: model tier strategy, how you make outputs reproducible, what you log, and the single biggest risk with its mitigation.",
+              "mechanical": [
+                {
+                  "type": "wordRange",
+                  "min": 120,
+                  "max": 300
+                },
+                {
+                  "type": "regexAll",
+                  "patterns": [
+                    "(log|trace)",
+                    "(residency|EU|region)"
+                  ]
+                },
+                {
+                  "type": "bannedPhrases"
+                }
+              ],
+              "rubric": "Which design would survive a principal architect review: reproducibility actually addressed (pinned model versions, stored prompts/inputs, seeds where supported), realistic latency math, honest top risk?"
+            },
+            {
+              "id": "aa-injection-threat",
+              "prompt": "An internal agent reads supplier PDFs and can call `create_payment_request(amount, iban)`. List the top three prompt-injection attack paths and a concrete control for each, as a markdown table with columns Attack | Control | Where enforced.",
+              "mechanical": [
+                {
+                  "type": "regexAll",
+                  "patterns": [
+                    "\\|\\s*Attack\\s*\\|\\s*Control\\s*\\|\\s*Where enforced\\s*\\|"
+                  ]
+                },
+                {
+                  "type": "lineCount",
+                  "pattern": "^\\|",
+                  "min": 5,
+                  "max": 7
+                }
+              ],
+              "rubric": "Which threat model is more correct and enforceable: controls outside the model (allowlists, human approval, schema validation) rather than 'tell the model not to'?"
+            }
+          ]
+        },
+        {
+          "tier": "T4",
+          "tasks": [
+            {
+              "id": "aa-webhook-idempotency",
+              "agent": {
+                "files": {
+                  "handler.mjs": "const seen = [];\nexport function handle(event, ledger) {\n  // Retries from the provider can deliver the same event id twice.\n  ledger.push({ id: event.id, amount: event.amount });\n  return ledger;\n}\n",
+                  "verify.mjs": "import { handle } from './handler.mjs';\nconst ledger = [];\nconst e = { id: 'evt_1', amount: 50 };\nhandle(e, ledger); handle(e, ledger); handle({ id: 'evt_2', amount: 10 }, ledger);\nconst total = ledger.reduce((s, r) => s + r.amount, 0);\nif (ledger.length !== 2 || total !== 60) { console.error('FAIL', ledger); process.exit(1); }\nconsole.log('PASS');\n"
+                },
+                "verify": [
+                  "node",
+                  "verify.mjs"
+                ]
+              },
+              "prompt": "In the current directory, handler.mjs double-books ledger entries when a webhook event is retried. Fix handler.mjs so the same event id is booked at most once. Do not modify verify.mjs. Run `node verify.mjs` to confirm it prints PASS."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

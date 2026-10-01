@@ -1,0 +1,191 @@
+{
+  "$comment": "Built on SIP — brand-lab model registry. Slugs are OpenRouter ids reused from frankx.ai lib/llm-hub/editorial.ts where present. `verified: false` means the slug has not been resolved against the live catalog from this repo; the runner's preflight (GET /api/v1/models) resolves every slug before any paid call and aborts on an unknown one. Families drive judge exclusion: a judge never scores a pair containing its own family.",
+  "version": "0.1",
+  "models": [
+    {
+      "id": "claude-opus-5.5",
+      "openrouterId": "anthropic/claude-opus-5.5",
+      "family": "anthropic",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "claude-sonnet-5.5",
+      "openrouterId": "anthropic/claude-sonnet-5.5",
+      "family": "anthropic",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "claude-sonnet-5",
+      "openrouterId": "anthropic/claude-sonnet-5",
+      "family": "anthropic",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "claude-opus-5",
+      "openrouterId": "anthropic/claude-opus-5",
+      "family": "anthropic",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "claude-haiku-4.5",
+      "openrouterId": "anthropic/claude-haiku-4.5",
+      "family": "anthropic",
+      "modality": "text",
+      "tier": "small",
+      "verified": false
+    },
+    {
+      "id": "gpt-5.5",
+      "openrouterId": "openai/gpt-5.5",
+      "family": "openai",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "gpt-oss-120b",
+      "openrouterId": "openai/gpt-oss-120b",
+      "family": "openai",
+      "modality": "text",
+      "tier": "open",
+      "verified": false
+    },
+    {
+      "id": "gemini-3.5-pro",
+      "openrouterId": "google/gemini-3.5-pro",
+      "family": "google",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "gemini-3.7-flash",
+      "openrouterId": "google/gemini-3.7-flash",
+      "family": "google",
+      "modality": "text",
+      "tier": "small",
+      "verified": false
+    },
+    {
+      "id": "grok-4.6",
+      "openrouterId": "x-ai/grok-4.6",
+      "family": "xai",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "openrouterId": "deepseek/deepseek-v4-pro-0813",
+      "family": "deepseek",
+      "modality": "text",
+      "tier": "open",
+      "verified": false
+    },
+    {
+      "id": "qwen3.7-max",
+      "openrouterId": "qwen/qwen3.7-max",
+      "family": "qwen",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "kimi-k2.6",
+      "openrouterId": "moonshotai/kimi-k2.6",
+      "family": "moonshot",
+      "modality": "text",
+      "tier": "open",
+      "verified": false
+    },
+    {
+      "id": "mistral-large-2512",
+      "openrouterId": "mistralai/mistral-large-2512",
+      "family": "mistral",
+      "modality": "text",
+      "tier": "frontier",
+      "verified": false
+    },
+    {
+      "id": "gemini-flash-image",
+      "openrouterId": "google/gemini-2.5-flash-image",
+      "family": "google",
+      "modality": "image",
+      "tier": "image",
+      "verified": false
+    },
+    {
+      "id": "gpt-image",
+      "openrouterId": "openai/gpt-5-image",
+      "family": "openai",
+      "modality": "image",
+      "tier": "image",
+      "verified": false
+    },
+    {
+      "id": "opencode-default",
+      "transport": "cli",
+      "command": [
+        "opencode",
+        "run"
+      ],
+      "promptVia": "arg",
+      "family": "harness:opencode",
+      "modality": "agent",
+      "tier": "harness",
+      "verified": false,
+      "note": "Agent-harness contestant. The model inside is whatever the harness is configured with; record it in the run's --note. Cost unmeasured (null)."
+    },
+    {
+      "id": "hermes-agent",
+      "transport": "cli",
+      "command": [
+        "hermes",
+        "chat",
+        "-q"
+      ],
+      "promptVia": "arg",
+      "family": "harness:hermes",
+      "modality": "agent",
+      "tier": "harness",
+      "verified": false,
+      "note": "Nous Hermes Agent CLI. Command shape is an assumption — confirm with `hermes --help` before the first run."
+    },
+    {
+      "id": "claude-code",
+      "transport": "cli",
+      "command": [
+        "claude",
+        "-p"
+      ],
+      "promptVia": "stdin",
+      "family": "harness:claude-code",
+      "modality": "agent",
+      "tier": "harness",
+      "verified": false
+    }
+  ],
+  "judges": {
+    "text": [
+      "gpt-5.5",
+      "gemini-3.5-pro",
+      "claude-opus-5.5",
+      "grok-4.6"
+    ],
+    "vision": [
+      "gemini-3.5-pro",
+      "gpt-5.5",
+      "claude-opus-5.5",
+      "grok-4.6"
+    ],
+    "$comment": "Two judges per pairwise comparison, taken in order after removing any judge whose family appears in the pair. Four families listed so any two-family pair still leaves two eligible judges."
+  }
+}
