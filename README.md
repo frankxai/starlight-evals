@@ -94,14 +94,14 @@ The pipeline is the agentic-ops collector (transcript scan, Codex native goal st
 
 The inputs are ten synthetic sessions: interactive and `claude -p` Claude transcripts, interactive and `codex exec` Codex rollouts, a partial (sliced) capture, a clipped prompt, a session outside any checkout, an unbound session, and a SQLite goal store in Codex's `thread_goals` schema. They run against a real Git checkout with uncommitted work.
 
-The scorecard groups 102 checks:
+The scorecard groups 104 checks:
 
 | Group | Asserts |
 |---|---|
 | intent-authority | interactive `/goal` requests gain authority; headless, automated, partial and clipped captures do not |
 | native-goals | native goals recover what a sliced transcript cannot, keep verified state, and raise goal and state conflicts; a native goal on a `codex exec` thread gains nothing |
 | workspace-and-checkout | checkout identity and the dirty flag are recorded; a session outside any checkout fails closed |
-| privacy | the default bundle holds no request text; private text needs an explicit opt-in |
+| privacy | the default bundle holds no request text; private text needs an explicit opt-in; the collector reads only the synthetic sessions, never a real `~/.claude` or `~/.codex`; the scorecard holds no host path, temp dir, user or host name, or error text |
 | quarantine | nine untrusted-claim cases are each held back with their named reason |
 | crash-replay | replay is a no-op; torn tails, missing receipts and missing events replay without duplicates; a reused event ID with new content refuses the bundle |
 | fail-closed | tampered, interrupted, self-admitting, foreign-kind, unsupported-revision and corrupt-store inputs are refused |
@@ -109,6 +109,8 @@ The scorecard groups 102 checks:
 | proof-gated-completion | admitted work completes only with every required proof |
 | no-autostart | nothing is started, admitted or resumed, and uncommitted work survives byte for byte |
 | regression-suites, continuity-proof | both repos' own continuity tests and `lifecycle/continuity-proof.js`, run unmodified |
+
+The scorecard is published, so it records only fixed check names, booleans, counts, pinned SHAs, sha256 digests and fixed refusal codes. Every child process runs with a sandboxed `HOME` and without token variables. A final scan replaces any string that still looks like host data and fails the run, and `harness/continuity/scorecard-privacy.test.mjs` runs the lane and checks the scorecard and the log independently.
 
 `npm run eval:continuity:mutations` applies nine deliberate regressions to the sandboxed sources, one per run (for example removing the owner check or accepting `codex exec` as interactive), and fails if any run still passes. All nine are caught.
 

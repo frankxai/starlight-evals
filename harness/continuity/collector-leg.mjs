@@ -40,6 +40,8 @@ const scanned = engine.scanSessions();
 const byKey = new Map(SESSIONS.map((s) => [s.key, scanned.find((x) => x.engine === s.engine && x.sessionId === s.id)]));
 check("intent-authority", "collector-observes-every-synthetic-session", SESSIONS.every((s) => byKey.get(s.key)),
   { observed: [...byKey.values()].filter(Boolean).length, expected: SESSIONS.length });
+// Any extra session would mean the collector read a real ~/.claude, ~/.codex, ~/.grok or Hermes store.
+check("privacy", "collector-reads-only-synthetic-sessions", scanned.length === SESSIONS.length, { scanned: scanned.length });
 for (const s of SESSIONS) {
   const seen = byKey.get(s.key);
   if (!seen) continue;

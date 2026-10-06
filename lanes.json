@@ -90,7 +90,7 @@
       "entrypoint": "harness/session-continuity.mjs (runnable) + harness/continuity/pins.json (pinned sources) + fixtures/continuity/golden/ (recorded collector output)",
       "receipts": "out/session-continuity-*.json (run-local; uploaded as a CI artifact by .github/workflows/continuity.yml)",
       "verification": "synthetic interactive, headless, partial and clipped transcripts plus a SQLite goal store in Codex's thread_goals schema run through the agentic-ops collector and the SIS importer, both fetched at pinned SHAs and refused on any sha256 mismatch. Also runs both repos' own continuity regression tests and agentic-ops lifecycle/continuity-proof.js unmodified. mutation-check.mjs proves each of nine injected regressions turns the lane red.",
-      "status": "v0.1 — PASS locally with the collector leg (102/102 checks). CI is PARTIAL until the AGENTIC_OPS_READ_TOKEN secret is configured, because agentic-ops is private. No live harness and no installed release are tested."
+      "status": "v0.1 — PASS locally with the collector leg (104/104 checks). CI is PARTIAL until the AGENTIC_OPS_READ_TOKEN secret is configured, because agentic-ops is private. No live harness and no installed release are tested."
     }
   ]
 }

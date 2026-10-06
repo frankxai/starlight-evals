@@ -15,6 +15,18 @@ const cliPath = join(sis, "src", "continuity-cli.ts");
 
 const checks = [];
 const check = (group, id, ok, detail) => checks.push({ group, id, ok: Boolean(ok), ...(detail === undefined ? {} : { detail }) });
+// Refusal text can carry store paths; the scorecard only ever records these fixed codes.
+const REFUSAL_CODES = [
+  [/unsupported SIS source revision/, "unsupported-source-revision"], [/Checksum mismatch/, "checksum-mismatch"],
+  [/manifest is incomplete/, "bundle-incomplete"], [/could not be read/, "bundle-unreadable"], [/may not claim/, "bundle-claims-authority"],
+  [/only supply intent\.captured/, "foreign-event-kind"], [/Trust policy/, "invalid-trust-policy"], [/corrupt line/, "corrupt-store-line"],
+  [/in progress/, "import-in-progress"], [/conflicts with stored content/, "event-id-conflict"], [/conflicts with the observation/, "observation-conflict"],
+  [/not registered/, "work-not-registered"], [/Only the registered owner/, "not-owner"], [/reason is required/, "reason-required"],
+  [/confirm the work ID/, "confirmation-required"], [/must require verification/, "verification-required"],
+  [/acknowledge it explicitly/, "paused-not-acknowledged"], [/already admitted/, "already-admitted"], [/Work is blocked/, "work-blocked"],
+  [/Work is completed/, "work-completed"], [/interactive terminal/, "no-interactive-terminal"], [/No trusted captured intent/, "no-trusted-intent"],
+];
+const code = (message) => message == null ? null : REFUSAL_CODES.find(([pattern]) => pattern.test(message))?.[1] ?? "unclassified";
 const sha = (v) => createHash("sha256").update(v).digest("hex");
 const read = (dir, f) => readFileSync(join(dir, f), "utf8");
 const bundle1 = JSON.parse(read(bundles.first, "continuity.json"));
@@ -59,7 +71,7 @@ const store = freshStore();
 const policy = basePolicy();
 const first = m.importContinuityBundle(bundles.first, store, policy);
 check("pipeline", "sis-imports-collector-bundle", first.status === "imported" && first.accepted.length === eventWorks.length && first.quarantined.length === 0,
-  { status: first.status, accepted: first.accepted.length, quarantined: first.quarantined.length, refusal: first.refusal });
+  { status: first.status, accepted: first.accepted.length, quarantined: first.quarantined.length, refusal: code(first.refusal) });
 check("no-autostart", "import-starts-nothing", first.executionStarted === false);
 const status = m.continuityStatus(store, policy);
 const work = (s, st = status) => st.works.find((w) => w.workId === s);
@@ -107,13 +119,13 @@ const replayB = m.importContinuityBundle(bundles.first, crashB, policy);
 const statusB = m.continuityStatus(crashB, policy);
 check("crash-replay", "torn-tail-is-ignored-and-replay-completes", replayB.status === "imported" && replayB.accepted.length === 0
   && replayB.duplicates.length === eventWorks.length && lines(join(crashB, "imports.jsonl")).length === 1 && statusB.works.length === eventWorks.length,
-  { status: replayB.status, duplicates: replayB.duplicates.length, refusal: replayB.refusal });
+  { status: replayB.status, duplicates: replayB.duplicates.length, refusal: code(replayB.refusal) });
 
 const conflicting = reseal(bundles.first, (b) => { b.events[0].summary = "Altered after export."; });
 const storedBefore = read(store, "events.jsonl");
 const conflict = m.importContinuityBundle(conflicting, store, policy);
 check("crash-replay", "reused-event-id-with-new-content-refuses-whole-bundle", conflict.status === "refused" && /conflicts with stored content/.test(conflict.refusal)
-  && read(store, "events.jsonl") === storedBefore, conflict.refusal);
+  && read(store, "events.jsonl") === storedBefore, code(conflict.refusal));
 
 // 3. Quarantine: each untrusted claim is held back with a reason, never silently dropped.
 const quarantineCase = (id, mutatePolicy, mutateBundle, expectReason, expectWorks) => {
@@ -126,7 +138,7 @@ const quarantineCase = (id, mutatePolicy, mutateBundle, expectReason, expectWork
   const held = lines(join(s, "quarantine.jsonl")).map((l) => JSON.parse(l));
   const ok = r.status === "imported" && reasons.length === expectWorks.length && reasons.every((x) => x === expectReason)
     && held.length === r.quarantined.length && !storeEvents(s).some((e) => expectWorks.includes(e.workId));
-  check("quarantine", id, ok, { reasons: r.quarantined.map((q) => `${q.workId}:${q.reason}`), status: r.status, refusal: r.refusal });
+  check("quarantine", id, ok, { reasons: r.quarantined.map((q) => `${q.workId}:${q.reason}`), status: r.status, refusal: code(r.refusal) });
 };
 quarantineCase("unregistered-work", (p) => { p.works = p.works.filter((w) => w.workId !== "work:claude-interactive"); }, null, "unregistered-work", ["work:claude-interactive"]);
 quarantineCase("project-mismatch", (p) => { p.works.find((w) => w.workId === "work:codex-interactive").projectId = "project:other"; }, null, "project-mismatch", ["work:codex-interactive"]);
@@ -146,7 +158,7 @@ quarantineCase("resume-not-forbidden", null, (b) => { b.events.find((e) => e.wor
 const refusalCase = (id, source, p, pattern) => {
   const s = freshStore();
   const r = m.importContinuityBundle(source, s, p);
-  check("fail-closed", id, r.status === "refused" && pattern.test(r.refusal ?? "") && lines(join(s, "events.jsonl")).length === 0, r.refusal);
+  check("fail-closed", id, r.status === "refused" && pattern.test(r.refusal ?? "") && lines(join(s, "events.jsonl")).length === 0, code(r.refusal));
 };
 refusalCase("unsupported-source-revision", bundles.first, { ...basePolicy(), supportedSourceRevisions: ["f".repeat(40)] }, /unsupported SIS source revision/);
 const tamperedDir = join(sandbox, "resealed", "tampered");
@@ -164,13 +176,13 @@ const corrupt = freshStore();
 m.importContinuityBundle(bundles.first, corrupt, policy);
 writeFileSync(join(corrupt, "events.jsonl"), "{not json}\n" + read(corrupt, "events.jsonl"));
 const corruptResult = m.importContinuityBundle(bundles.second, corrupt, policy);
-check("fail-closed", "corrupt-store-line-refuses-import", corruptResult.status === "refused" && /corrupt line/.test(corruptResult.refusal), corruptResult.refusal);
+check("fail-closed", "corrupt-store-line-refuses-import", corruptResult.status === "refused" && /corrupt line/.test(corruptResult.refusal), code(corruptResult.refusal));
 const locked = freshStore();
 mkdirSync(locked, { recursive: true });
 writeFileSync(join(locked, ".import.lock"), JSON.stringify({ pid: process.pid, host: (await import("node:os")).hostname(), token: "live-holder" }));
 const lockedResult = m.importContinuityBundle(bundles.first, locked, policy);
 check("fail-closed", "live-import-lock-is-never-preempted", lockedResult.status === "refused" && /in progress/.test(lockedResult.refusal) && !existsSync(join(locked, "events.jsonl")),
-  lockedResult.refusal);
+  code(lockedResult.refusal));
 
 // 5. Owner-only admission. Only the registered owner, present at a terminal, may admit.
 const NOW = new Date("2026-10-04T22:00:00.000Z");
@@ -189,22 +201,22 @@ const refusals = {
     requirements: { artifact: true, change: true, checks: true, deployment: false, verification: false } }),
 };
 check("owner-admission", "non-owner-and-unconfirmed-admissions-refused", Object.values(refusals).every((r) => r.ok === false),
-  Object.fromEntries(Object.entries(refusals).map(([k, v]) => [k, v.ok ? "ADMITTED" : v.error])));
+  Object.fromEntries(Object.entries(refusals).map(([k, v]) => [k, v.ok ? "ADMITTED" : code(v.error)])));
 check("owner-admission", "refusals-write-nothing", !storeEvents(store).some((e) => e.kind !== "intent.captured"));
 const cli = spawnSync(process.execPath, ["--import", loader, cliPath, "reconcile", "--work", target, "--actor", OWNER, "--decision", "admit", "--reason", "eval", "--acknowledge-paused"],
   { env: { ...process.env, SIS_CONTINUITY_HOME: join(sandbox, "sis-cli-home") }, encoding: "utf8" });
-check("owner-admission", "agents-without-a-terminal-cannot-admit-through-the-cli", cli.status === 1 && /interactive terminal/.test(cli.stderr), cli.stderr.trim());
+check("owner-admission", "agents-without-a-terminal-cannot-admit-through-the-cli", cli.status === 1 && /interactive terminal/.test(cli.stderr), code(cli.stderr));
 const owner = attempt({ workId: target, actorId: OWNER, decision: "admit", confirmation: typed(target), acknowledgePaused: true });
 check("owner-admission", "registered-owner-admits-after-acknowledging-paused-state", owner.ok && owner.event.kind === "work.admitted"
-  && owner.event.source.system === "human" && owner.event.data.acknowledgedReportedState === true, owner.ok ? owner.event.kind : owner.error);
+  && owner.event.source.system === "human" && owner.event.data.acknowledgedReportedState === true, owner.ok ? owner.event.kind : code(owner.error));
 const secondClaim = attempt({ workId: target, actorId: OWNER, decision: "admit", confirmation: typed(target), acknowledgePaused: true });
-check("owner-admission", "second-admission-claim-refused", secondClaim.ok === false && /already admitted/.test(secondClaim.error), secondClaim.error);
+check("owner-admission", "second-admission-claim-refused", secondClaim.ok === false && /already admitted/.test(secondClaim.error), code(secondClaim.error));
 const activeAdmit = attempt({ workId: "work:codex-interactive", actorId: OWNER, decision: "admit", confirmation: typed("work:codex-interactive") });
-check("owner-admission", "reported-active-work-admits-without-acknowledgement", activeAdmit.ok, activeAdmit.ok ? "admitted" : activeAdmit.error);
+check("owner-admission", "reported-active-work-admits-without-acknowledgement", activeAdmit.ok, activeAdmit.ok ? "admitted" : code(activeAdmit.error));
 const blocked = attempt({ workId: "work:claude-interactive", actorId: OWNER, decision: "block", confirmation: typed("work:claude-interactive") });
 const afterBlock = attempt({ workId: "work:claude-interactive", actorId: OWNER, decision: "admit", confirmation: typed("work:claude-interactive"), acknowledgePaused: true });
 check("owner-admission", "owner-block-is-final-for-admission", blocked.ok && blocked.event.kind === "work.blocked" && afterBlock.ok === false && /blocked/.test(afterBlock.error),
-  afterBlock.error);
+  code(afterBlock.error));
 
 // 6. Proof-gated completion.
 const admittedStatus = work(target, m.continuityStatus(store, policy));

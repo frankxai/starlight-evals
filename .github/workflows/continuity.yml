@@ -53,6 +53,11 @@ jobs:
             node harness/session-continuity.mjs
           fi
 
+      - name: Scorecard and log carry no host paths, identity or error text
+        env:
+          AGENTIC_OPS_TOKEN: ${{ secrets.AGENTIC_OPS_READ_TOKEN }}
+        run: node --test harness/continuity/scorecard-privacy.test.mjs
+
       - name: Upload the JSON scorecard
         if: always()
         uses: actions/upload-artifact@v4

@@ -34,8 +34,8 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { homedir, hostname, tmpdir, userInfo } from "node:os";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gitEnv, writeProofThread } from "./continuity/fixtures.mjs";
 
@@ -63,7 +63,7 @@ async function fetchPinned(spec, path) {
   const headers = { "User-Agent": "starlight-evals-continuity" };
   let url;
   if (spec.visibility === "private") {
-    if (!token) return { error: "AGENTIC_OPS_TOKEN is not set" };
+    if (!token) return { error: "missing-token" };
     url = `https://api.github.com/repos/${spec.repo}/contents/${path}?ref=${spec.sha}`;
     headers.Accept = "application/vnd.github.raw";
     headers.Authorization = `Bearer ${token}`;
@@ -74,9 +74,9 @@ async function fetchPinned(spec, path) {
     try {
       const response = await fetch(url, { headers });
       if (response.ok) return { bytes: Buffer.from(await response.arrayBuffer()) };
-      if (attempt >= 3 || response.status < 500) return { error: `HTTP ${response.status}` };
+      if (attempt >= 3 || response.status < 500) return { error: `http-${response.status}` };
     } catch (error) {
-      if (attempt >= 3) return { error: error.message };
+      if (attempt >= 3) return { error: "network-error" };
     }
     await new Promise((r) => setTimeout(r, 1000 * attempt));
   }
@@ -128,6 +128,8 @@ const loader = pathToFileURL(join(sisDir, "node_modules", "tsx", "index.mjs")).h
 function sandboxEnv(home, extra = {}) {
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/TOKEN|SECRET|PASSWORD|API_KEY/i.test(key)) delete env[key];
+  // Under an outer `node --test`, this would route the nested suites' results to the parent.
+  delete env.NODE_TEST_CONTEXT;
   mkdirSync(home, { recursive: true });
   return { ...env, ...gitEnv(sandbox), HOME: home, USERPROFILE: home, LOCALAPPDATA: join(home, "AppData", "Local"), APPDATA: join(home, "AppData", "Roaming"),
     ASPH_SESSION_INDEX: join(home, "asph-index.v2.json"), PROMPT_LEDGER_DIR: join(home, "prompt-ledger"),
@@ -141,7 +143,7 @@ function runLeg(name, args, env, cwd = ROOT) {
     checks.push(...result.checks);
     return result;
   } catch {
-    check(name, `${name}-leg-ran`, false, { exitCode: r.status, stderr: (r.stderr || "").slice(-2000) });
+    check(name, `${name}-leg-ran`, false, { exitCode: r.status, code: "leg-crashed" });
     return null;
   }
 }
@@ -151,7 +153,7 @@ function tapSuite(group, id, args, cwd, env) {
   const count = (label) => Number((new RegExp(`^# ${label} (\\d+)`, "m").exec(r.stdout) || [])[1] ?? NaN);
   const result = { tests: count("tests"), pass: count("pass"), fail: count("fail"), skipped: count("skipped"), todo: count("todo") };
   const failing = [...r.stdout.matchAll(/^\s*not ok \d+ - (.+)$/gm)].map((x) => x[1]).slice(0, 20);
-  check(group, id, r.status === 0 && result.fail === 0 && result.pass > 0, { ...result, ...(failing.length ? { failing } : {}), ...(r.status ? { stderr: (r.stderr || "").slice(-1500) } : {}) });
+  check(group, id, r.status === 0 && result.fail === 0 && result.pass > 0, { ...result, ...(failing.length ? { failing } : {}), ...(r.status ? { exitCode: r.status } : {}) });
   return result;
 }
 
@@ -171,7 +173,7 @@ if (collectorBlocked) {
     // Record or compare the collector output, with the sandbox path replaced, as golden bundles.
     const normalize = spawnSync(process.execPath, [join(LANE, "normalize-bundle.cjs"), lifecycle, join(sandbox, "collector"), join(sandbox, "golden-candidate"),
       result.bundles.first, result.bundles.second], { env: sandboxEnv(join(sandbox, "normalize-home")), encoding: "utf8" });
-    if (normalize.status !== 0) check("pipeline", "golden-bundles-normalized", false, normalize.stderr.slice(-1500));
+    if (normalize.status !== 0) check("pipeline", "golden-bundles-normalized", false, { exitCode: normalize.status });
     else if (flag("--record-golden") && !MUTATION) {
       rmSync(GOLDEN, { recursive: true, force: true });
       cpSync(join(sandbox, "golden-candidate"), GOLDEN, { recursive: true });
@@ -229,11 +231,38 @@ if (legs.collector.status === "RAN") {
     legs.continuityProof = { pass: receipt.pass, complete: receipt.complete, scope: receipt.scope,
       note: "complete=false is expected: the real interrupted claude/codex harness leg (--harness-runs) spends tokens and is never run here" };
   } else {
-    check("continuity-proof", "continuity-proof-ran", false, { exitCode: proof.status, stderr: (proof.stderr || "").slice(-2000) });
+    check("continuity-proof", "continuity-proof-ran", false, { exitCode: proof.status, code: "proof-crashed" });
   }
 }
 
 // ---- 6. Scorecard -------------------------------------------------------------------------
+// Last line of defence: the scorecard is published as a CI artifact, so no string in it may
+// carry a host path, temp dir, user name, host name or error/stack text. Any hit is
+// replaced and fails the run, because it means an upstream detail escaped its code mapping.
+const forbidden = [sandbox, tmpdir(), homedir(), ROOT, OUT_DIR].filter((v) => v && v.length > 3)
+  .flatMap((v) => [v, v.replace(/\\/g, "/")]).map((v) => v.toLowerCase());
+const userName = (() => { try { return userInfo().username; } catch { return ""; } })();
+const PUBLIC_NAMES = [...new Set([...Object.values(pins).map((p) => p.repo), "starlight-evals"])];
+const wordPatterns = [userName, hostname()].filter((v) => v && v.length >= 3)
+  .map((v) => new RegExp(`(^|[^A-Za-z0-9])${v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^A-Za-z0-9]|$)`, "i"));
+const hostDataPatterns = [/\b[A-Za-z]:[\\/]/, /(^|[^A-Za-z0-9.])\/(home|Users|tmp|var|private|root|runner)\//, /\bError:/, /\n\s+at\s/, /node:internal/];
+let redactions = 0;
+const scrub = (value) => {
+  if (typeof value === "string") {
+    const lower = value.toLowerCase();
+    // A host can be named like a pinned public repo (e.g. "Starlight"); those names are not host data.
+    const unpinned = PUBLIC_NAMES.reduce((text, name) => text.split(name).join(" "), value);
+    if (forbidden.some((v) => lower.includes(v)) || wordPatterns.some((p) => p.test(unpinned)) || hostDataPatterns.some((p) => p.test(value))) { redactions++; return "[redacted-host-data]"; }
+    return value;
+  }
+  if (Array.isArray(value)) return value.map(scrub);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, scrub(v)]));
+  return value;
+};
+for (const c of checks) if (c.detail !== undefined) c.detail = scrub(c.detail);
+for (const key of Object.keys(legs)) legs[key] = scrub(legs[key]);
+for (const [i, source] of sources.entries()) sources[i] = scrub(source);
+check("privacy", "scorecard-free-of-host-identifiers", redactions === 0, { redactions });
 const failed = checks.filter((c) => !c.ok);
 const verdict = failed.length ? "FAIL" : legs.collector.status === "RAN" ? "PASS" : "PARTIAL";
 const exitCode = verdict === "FAIL" || (verdict === "PARTIAL" && flag("--require-collector")) ? 1 : 0;
@@ -244,7 +273,7 @@ const scorecard = {
   lane: "session-continuity",
   version: "0.1",
   generatedAt: new Date().toISOString(),
-  runner: { node: process.version, platform: process.platform, ci: Boolean(process.env.CI) },
+  execution: { node: process.version, platform: process.platform, ci: Boolean(process.env.CI) },
   ...(MUTATION ? { mutation: MUTATION } : {}),
   verdict,
   summary: { checks: checks.length, passed: checks.length - failed.length, failed: failed.length },
@@ -280,7 +309,7 @@ console.log(`\nSession continuity lane v0.1 — ${verdict}${MUTATION ? ` (mutati
 console.log(`collector leg: ${legs.collector.status}${legs.collector.reason ? ` (${legs.collector.reason})` : ""}; SIS leg on ${bundleSource} bundles`);
 for (const [group, g] of Object.entries(groups)) console.log(`  ${g.failed ? "FAIL" : "ok  "} ${group.padEnd(24)} ${g.passed}/${g.passed + g.failed}`);
 for (const c of failed) console.log(`  FAILED ${c.group}/${c.id}: ${JSON.stringify(c.detail ?? null).slice(0, 400)}`);
-console.log(`${scorecard.summary.passed}/${scorecard.summary.checks} checks passed. Scorecard: ${outFile}`);
+console.log(`${scorecard.summary.passed}/${scorecard.summary.checks} checks passed. Scorecard: ${relative(process.cwd(), outFile).replace(/\\/g, "/")}`);
 if (verdict === "PARTIAL") {
   const message = "PARTIAL: the private collector leg did not run, so this is not a PASS. Set AGENTIC_OPS_TOKEN to run it.";
   console.log(process.env.GITHUB_ACTIONS ? `::warning title=Continuity collector leg blocked::${message}` : message);
