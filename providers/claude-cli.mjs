@@ -103,7 +103,7 @@ function spawnClaude({ prompt, model, timeoutMs }) {
 // full tool/slash-command catalog), so naively slicing from the start of
 // raw stdout silently drops the one line that matters. Always try JSON
 // first; only fall back to a raw-text tail (not head) if parsing fails.
-function extractFailureReason(stdout, stderr) {
+export function extractFailureReason(stdout, stderr) {
   try {
     const parsed = JSON.parse(stdout);
     const events = Array.isArray(parsed) ? parsed : [parsed];
@@ -122,7 +122,7 @@ function extractFailureReason(stdout, stderr) {
 // `claude -p --output-format json` normally prints one JSON object (the
 // "result" event). Guard for the array-of-events shape too, in case a future
 // CLI version streams events even in non-stream-json mode.
-function parseClaudeStdout(stdout) {
+export function parseClaudeStdout(stdout) {
   let parsed;
   try {
     parsed = JSON.parse(stdout);
