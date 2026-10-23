@@ -6,7 +6,7 @@ This repo is part of the FrankX / Starlight / Arcanea agent estate.
 
 - Repo: `starlight-evals`
 - Class: public mirror — whole-system evaluation harness (scorecards + round receipts) for the Starlight Intelligence System
-- Default health command: `npm run validate` (schema-checks published JSON receipts) and `npm run probe` (runs the income/payments red-blue adversarial lane; degrades to `PENDING` without cross-repo dependencies, exits nonzero on a real defense failure). `npm test` runs both.
+- Default health command: `npm run validate` (schema-checks published JSON receipts) and `npm run probe` (runs the income/payments red-blue adversarial lane; degrades to `PENDING` without cross-repo dependencies, exits nonzero on a real defense failure). `npm test` runs both (and the claude-cli provider tests).
 - Remote: https://github.com/frankxai/starlight-evals
 
 ## What this repo is
