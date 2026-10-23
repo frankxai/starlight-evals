@@ -29,7 +29,9 @@
  *   the verdict is PARTIAL, never PASS. --require-collector turns BLOCKED into a failure.
  *
  * USAGE
- *   node harness/session-continuity.mjs [--out DIR] [--require-collector] [--record-golden] [--keep-sandbox]
+ *   node harness/session-continuity.mjs --help
+ *   A run fetches the pinned sources from GitHub and writes a scorecard. Unknown arguments
+ *   exit 2 before anything is fetched.
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -37,6 +39,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, 
 import { homedir, hostname, tmpdir, userInfo } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { parseCli } from "./cli.mjs";
 import { gitEnv, writeProofThread } from "./continuity/fixtures.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -45,10 +48,27 @@ const LANE = join(HERE, "continuity");
 const GOLDEN = join(ROOT, "fixtures", "continuity", "golden");
 const BUNDLE_FILES = ["events.jsonl", "continuity.json", "recovery.txt", "manifest.json"];
 
-const argv = process.argv.slice(2);
-const flag = (name) => argv.includes(name);
-const outIndex = argv.indexOf("--out");
-const OUT_DIR = resolve(outIndex >= 0 ? argv[outIndex + 1] : join(ROOT, "out"));
+const USAGE = `Usage: node harness/session-continuity.mjs [options]
+
+Runs synthetic sessions through the pinned agentic-ops collector and the pinned SIS importer
+and writes a JSON scorecard. A run fetches the pinned sources from GitHub; set
+AGENTIC_OPS_TOKEN to include the private collector leg.
+
+Options:
+  --out DIR             scorecard directory (default: out/)
+  --require-collector   exit 1 if the collector leg is blocked, instead of reporting PARTIAL
+  --record-golden       replace fixtures/continuity/golden with this run's collector output; review the diff
+  --keep-sandbox        keep the temporary sandbox directory
+  --mutation NAME       apply one entry from harness/continuity/mutations.json (used by mutation-check)
+  -h, --help            print this text and exit 0
+
+An unknown argument, or an option with no value, exits 2 before anything is fetched.`;
+const cli = parseCli({
+  usage: USAGE,
+  flags: { "--out": "value", "--mutation": "value", "--require-collector": "boolean", "--record-golden": "boolean", "--keep-sandbox": "boolean" },
+});
+const flag = (name) => Boolean(cli[name]);
+const OUT_DIR = resolve(cli["--out"] ?? join(ROOT, "out"));
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const checks = [];
@@ -111,8 +131,7 @@ const sisDir = join(sandbox, "sis");
 place(opsDir, { ...fetched["agentic-ops"], "package.json": '{"type":"commonjs"}\n' });
 place(sisDir, { ...fetched.sis, "package.json": '{"type":"module"}\n' });
 cpSync(join(LANE, "loader"), join(sisDir, "node_modules", "tsx"), { recursive: true });
-const mutationIndex = argv.indexOf("--mutation");
-const MUTATION = mutationIndex >= 0 ? argv[mutationIndex + 1] : null;
+const MUTATION = cli["--mutation"] ?? null;
 if (MUTATION) {
   const edits = JSON.parse(readFileSync(join(LANE, "mutations.json"), "utf8"))[MUTATION];
   if (!edits) throw new Error(`Unknown mutation ${MUTATION}`);
