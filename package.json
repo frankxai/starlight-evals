@@ -9,7 +9,7 @@
   "scripts": {
     "probe": "node harness/income-payments-safety.mjs",
     "validate": "node scripts/validate-json.mjs",
-    "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs && node --test providers/claude-cli.test.mjs",
+    "test": "node scripts/validate-json.mjs && node harness/income-payments-safety.mjs && node --test providers/claude-cli.test.mjs harness/continuity/loader/hooks.test.mjs",
     "lint:skills": "node scripts/lint-skills.mjs",
     "eval:pf": "npx -y promptfoo@latest eval -c promptfooconfig.yaml",
     "eval:r5": "node harness/deep-reasoning.mjs",
