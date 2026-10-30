@@ -27,6 +27,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { parseCli } from "./cli.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
@@ -448,6 +449,19 @@ function pendingRow(probe, attackClass, targetLayer, defense, reason) {
 // Main
 // =========================================================================
 async function main() {
+  parseCli({
+    usage: `Usage: node harness/income-payments-safety.mjs
+
+Runs the Income & Payments Safety red/blue probes it can execute and writes a run receipt to
+out/income-payments-safety-<timestamp>.json. Probes whose repo is absent are recorded as PENDING.
+Exits 1 only when a probe that ran returned FAIL. Calls no model.
+
+Options:
+  -h, --help   print this text and exit 0
+
+An unknown argument exits 2 before any probe runs.`,
+    flags: {},
+  });
   const rows = [];
   const mods = await loadPaymentsModules();
 

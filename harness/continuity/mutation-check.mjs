@@ -6,6 +6,22 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseCli } from "../cli.mjs";
+
+parseCli({
+  usage: `Usage: node harness/continuity/mutation-check.mjs
+
+Runs the session-continuity lane once per deliberate regression in harness/continuity/mutations.json
+and exits 1 if any mutated run still reaches PASS or PARTIAL. Each run fetches the pinned sources
+from GitHub. Collector mutations need AGENTIC_OPS_TOKEN and are reported as not run without it.
+Writes out/session-continuity-mutation-check.json.
+
+Options:
+  -h, --help   print this text and exit 0
+
+An unknown argument exits 2 before anything is fetched.`,
+  flags: {},
+});
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..", "..");

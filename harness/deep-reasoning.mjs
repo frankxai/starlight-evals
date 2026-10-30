@@ -48,15 +48,17 @@
  *   an oversight — do not "fix" it by sending an effort the API would reject.
  *
  * USAGE
- *   node harness/deep-reasoning.mjs [--dry-run] [--tasks d1,d3] [--models opus,haiku]
- *                                   [--effort high] [--concurrency 4] [--out PATH]
+ *   node harness/deep-reasoning.mjs --help
  *   --dry-run assembles every prompt and reports its size without spending anything.
+ *   Any other run calls the local claude CLI and spends model quota. Unknown arguments
+ *   exit 2 before anything is called.
  */
 
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { parseCli } from "./cli.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
@@ -87,19 +89,41 @@ const ANSWER_INSTRUCTION = (format) =>
   `\n\nWork the problem, then end your reply with a single final line in exactly this form:\n${format}\nNothing may follow that line.`;
 
 // ---- Args -----------------------------------------------------------------
+const USAGE = `Usage: node harness/deep-reasoning.mjs [options]
+
+Runs the pre-registered R5 card (rounds/R5-DESIGN.md) across the Claude tiers through the
+local claude CLI and writes a run receipt. A run without --dry-run spends model quota.
+
+Options:
+  --dry-run            assemble every prompt and report its size; call no model, write nothing
+  --tasks IDS          comma-separated task ids to run (default: all fixtures)
+  --models KEYS        comma-separated tiers to run: fable, opus, sonnet, haiku (default: all)
+  --effort LEVEL       effort sent to tiers that accept it (default: high)
+  --concurrency N      parallel model calls (default: 4)
+  --timeout-ms MS      per-call timeout (default: 900000)
+  --out PATH           receipt path (default: out/r5-deep-reasoning-<date>.json)
+  -h, --help           print this text and exit 0
+
+An unknown argument, or an option with no value, exits 2 before any model is called.`;
+
 function parseArgs(argv) {
-  const out = { dryRun: false, tasks: null, models: null, effort: "high", concurrency: 4, out: null, timeoutMs: 900_000 };
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === "--dry-run") out.dryRun = true;
-    else if (a === "--tasks") out.tasks = argv[++i].split(",").map((s) => s.trim()).filter(Boolean);
-    else if (a === "--models") out.models = argv[++i].split(",").map((s) => s.trim()).filter(Boolean);
-    else if (a === "--effort") out.effort = argv[++i];
-    else if (a === "--concurrency") out.concurrency = Number(argv[++i]);
-    else if (a === "--out") out.out = argv[++i];
-    else if (a === "--timeout-ms") out.timeoutMs = Number(argv[++i]);
-  }
-  return out;
+  const given = parseCli({
+    usage: USAGE,
+    flags: {
+      "--dry-run": "boolean", "--tasks": "value", "--models": "value", "--effort": "value",
+      "--concurrency": "value", "--out": "value", "--timeout-ms": "value",
+    },
+  }, argv);
+  const list = (text) => text.split(",").map((s) => s.trim()).filter(Boolean);
+  return {
+    dryRun: Boolean(given["--dry-run"]),
+    tasks: given["--tasks"] === undefined ? null : list(given["--tasks"]),
+    models: given["--models"] === undefined ? null : list(given["--models"]),
+    effort: given["--effort"] ?? "high",
+    concurrency: given["--concurrency"] === undefined ? 4 : Number(given["--concurrency"]),
+    out: given["--out"] ?? null,
+    timeoutMs: given["--timeout-ms"] === undefined ? 900_000 : Number(given["--timeout-ms"]),
+  };
 }
 
 // ---- Fixture loading + deterministic prompt assembly -----------------------
